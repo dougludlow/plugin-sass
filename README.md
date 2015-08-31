@@ -3,17 +3,7 @@
 SystemJS SASS loader plugin
 
 ```sh
-$ jspm install sass
-```
-
-In your `config.js`
-
-```sh
-System.config({
-  map: {
-    "scss": "jspm:plugin-sass@0.0.1"
-  }
-});
+$ jspm install scss=github:screendriver/plugin-sass
 ```
 
 To apply your SASS styles to your current page:
