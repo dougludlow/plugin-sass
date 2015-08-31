@@ -2,7 +2,10 @@
   "name": "plugin-sass",
   "version": "0.0.1",
   "description": "SystemJS SASS loader plugin",
-  "main": "sass.js",
+  "main": "./lib/sass.js",
+  "scripts": {
+    "prepublish": "gulp"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
