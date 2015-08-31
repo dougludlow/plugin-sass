@@ -18,5 +18,13 @@
   "homepage": "https://github.com/ScreenDriver/plugin-sass#readme",
   "dependencies": {
     "node-sass": "^3.3.2"
+  },
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.23",
+    "del": "^2.0.0",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.1",
+    "gulp-notify": "^2.2.0"
   }
 }
