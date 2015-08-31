@@ -4,8 +4,8 @@ import eslint from 'gulp-eslint';
 import gulp from 'gulp';
 import notify from 'gulp-notify';
 
-gulp.task('clean', (done) => {
-  del(['lib'], done);
+gulp.task('clean', () => {
+  return del(['lib']);
 });
 
 gulp.task('lint', () => {
@@ -21,7 +21,7 @@ gulp.task('javascript', () => {
     .pipe(gulp.dest('./lib'));
 });
 
-gulp.task('build', ['javascript'], () => {
+gulp.task('build', ['javascript', 'lint'], () => {
   return gulp.src('.')
     .pipe(notify({
       message: 'Successfully build',
