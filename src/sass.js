@@ -12,7 +12,7 @@ const scssFetch = load => {
             style.textContent = result.text;
             style.setAttribute('type', 'text/css');
             document.getElementsByTagName('head')[0].appendChild(style);
-            resolve();
+            resolve('');
           } else {
             reject();
           }

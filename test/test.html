@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Test</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script src="jspm_packages/system.js"></script>
+  <script src="config.js"></script>
+  <script>
+    System.import('test.scss!')
+      .then(() => {
+        document.body.innerHTML += '<h2>Loading done</h2>';
+      });
+  </script>
+</head>
+
+<body>
+  <h1>Background should become green</h1>
+  <h2>Loading...</h2>
+</body>
+
+</html>

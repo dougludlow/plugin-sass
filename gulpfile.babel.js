@@ -1,12 +1,9 @@
-import babel from 'gulp-babel';
-import del from 'del';
+import browserSync from 'browser-sync';
 import eslint from 'gulp-eslint';
 import gulp from 'gulp';
 import notify from 'gulp-notify';
 
-gulp.task('clean', () => {
-  return del(['lib']);
-});
+browserSync.create();
 
 gulp.task('lint', () => {
   return gulp.src('./src/**/*.js')
@@ -15,20 +12,20 @@ gulp.task('lint', () => {
     .pipe(eslint.failOnError());
 });
 
-gulp.task('javascript', () => {
-  return gulp.src('src/**/*.js')
-    .pipe(babel())
-    .pipe(gulp.dest('./lib'));
+gulp.task('test', ['lint'], () => {
+  browserSync.init({
+    server: {
+      index: 'test.html',
+      baseDir: ['./test', './'],
+    },
+    files: ['src/**.js', 'test/**.html', 'test/**.scss'],
+  });
 });
 
-gulp.task('build', ['javascript', 'lint'], () => {
+gulp.task('default', ['lint'], () => {
   return gulp.src('.')
     .pipe(notify({
       message: 'Successfully build',
       onLast: true,
     }));
-});
-
-gulp.task('default', ['clean'], () => {
-  gulp.start('build');
 });

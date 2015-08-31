@@ -14,6 +14,7 @@ System.config({
   },
 
   map: {
+    "scss": "src/sass.js",
     "babel": "npm:babel-core@5.8.23",
     "babel-runtime": "npm:babel-runtime@5.8.20",
     "core-js": "npm:core-js@1.1.3",
