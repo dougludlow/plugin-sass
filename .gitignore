@@ -4,3 +4,6 @@ node_modules
 
 # Transpiled JavaScript
 lib
+
+# JSPM
+jspm_packages
