@@ -1,10 +1,18 @@
 import babel from 'gulp-babel';
 import del from 'del';
+import eslint from 'gulp-eslint';
 import gulp from 'gulp';
 import notify from 'gulp-notify';
 
 gulp.task('clean', (done) => {
   del(['lib'], done);
+});
+
+gulp.task('lint', () => {
+  return gulp.src('./src/**/*.js')
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError());
 });
 
 gulp.task('javascript', () => {
