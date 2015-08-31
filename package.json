@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ScreenDriver/plugin-sass.git"
+    "url": "git+https://github.com/screendriver/plugin-sass.git"
   },
   "author": "Christian Rackerseder <github@echooff.de>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ScreenDriver/plugin-sass/issues"
+    "url": "https://github.com/screendriver/plugin-sass/issues"
   },
-  "homepage": "https://github.com/ScreenDriver/plugin-sass#readme",
+  "homepage": "https://github.com/screendriver/plugin-sass#readme",
   "devDependencies": {
     "babel": "^5.8.23",
     "babel-core": "^5.8.23",
