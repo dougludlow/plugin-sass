@@ -4,6 +4,5 @@ node_js:
   - '0.12'
   - 'iojs-v2.5.0'
 before_install:
-  - npm install -g gulp jspm
-  - jspm install
+  - npm install -g gulp
 script: gulp
