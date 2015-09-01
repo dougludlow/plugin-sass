@@ -14,12 +14,12 @@ System.config({
   },
 
   map: {
-    "scss": "src/sass.js",
     "babel": "npm:babel-core@5.8.23",
     "babel-runtime": "npm:babel-runtime@5.8.20",
     "core-js": "npm:core-js@1.1.3",
     "fetch": "npm:whatwg-fetch@0.9.0",
     "sass.js": "npm:sass.js@0.9.2",
+    "scss": "src/sass.js",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },
