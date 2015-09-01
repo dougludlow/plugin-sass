@@ -1,5 +1,7 @@
-$color: green;
+@import 'headings';
+
+$bodyColor: green;
 
 body {
-  background-color: $color;
+  background-color: $bodyColor;
 }

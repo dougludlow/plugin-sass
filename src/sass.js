@@ -1,5 +1,16 @@
 import 'fetch';
+import url from 'url';
 import sass from 'sass.js';
+
+let urlBase;
+
+// intercept file loading requests (@import directive) from libsass
+sass.importer((request, done) => {
+  const importUrl = url.resolve(urlBase, `${request.current}.scss`);
+  fetch(importUrl)
+    .then(response => response.text())
+    .then(content => done({ content }));
+});
 
 const compile = scss => {
   return new Promise((resolve, reject) => {
@@ -11,14 +22,16 @@ const compile = scss => {
         document.getElementsByTagName('head')[0].appendChild(style);
         resolve('');
       } else {
-        reject();
+        reject(result.formatted);
       }
     });
   });
 };
 
 const scssFetch = load => {
-  return fetch(load.address)
+  urlBase = load.address;
+  // fetch initial scss file
+  return fetch(urlBase)
     .then(response => response.text())
     .then(compile);
 };
