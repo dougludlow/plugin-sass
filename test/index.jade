@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    title Test
+    meta(charset='utf-8')
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    script(src='jspm_packages/system.js')
+    script(src='config.js')
+    script(type='text/javascript').
+      System.import('test/test.scss!')
+        .then(() => {
+          document.body.innerHTML += '<h2>Loading done</h2>';
+        });
+  body
+    h1 I should become blue and background should become green
+    h2 Loading...

@@ -1,9 +1,21 @@
-import browserSync from 'browser-sync';
+import browserSyncModule from 'browser-sync';
+import del from 'del';
 import eslint from 'gulp-eslint';
 import gulp from 'gulp';
+import jade from 'gulp-jade';
 import notify from 'gulp-notify';
 
-browserSync.create();
+const browserSync = browserSyncModule.create();
+
+gulp.task('clean', () => {
+  return del('.tmp');
+});
+
+gulp.task('jade', () => {
+  return gulp.src('test/index.jade')
+    .pipe(jade())
+    .pipe(gulp.dest('.tmp'));
+});
 
 gulp.task('lint', () => {
   return gulp.src('./src/**/*.js')
@@ -12,13 +24,12 @@ gulp.task('lint', () => {
     .pipe(eslint.failOnError());
 });
 
-gulp.task('test', ['lint'], () => {
+gulp.task('test', ['jade'], () => {
   browserSync.init({
     server: {
-      index: 'test.html',
-      baseDir: ['./test', './'],
+      baseDir: ['.'],
+      index: '.tmp/index.html',
     },
-    files: ['src/**.js', 'test/**.html', 'test/**.scss'],
   });
 });
 

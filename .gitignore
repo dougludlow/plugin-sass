@@ -7,3 +7,6 @@ lib
 
 # JSPM
 jspm_packages
+
+npm-debug.log
+.tmp

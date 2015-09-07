@@ -85,7 +85,7 @@ System.config({
       "crypto": "github:jspm/nodelibs-crypto@0.1.0",
       "randombytes": "npm:randombytes@2.0.1"
     },
-    "npm:browserify-sign@3.0.3": {
+    "npm:browserify-sign@3.0.8": {
       "bn.js": "npm:bn.js@2.2.0",
       "browserify-rsa": "npm:browserify-rsa@2.0.1",
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
@@ -141,7 +141,7 @@ System.config({
     },
     "npm:crypto-browserify@3.9.14": {
       "browserify-aes": "npm:browserify-aes@1.0.3",
-      "browserify-sign": "npm:browserify-sign@3.0.3",
+      "browserify-sign": "npm:browserify-sign@3.0.8",
       "create-ecdh": "npm:create-ecdh@2.0.1",
       "create-hash": "npm:create-hash@1.1.1",
       "create-hmac": "npm:create-hmac@1.1.3",
