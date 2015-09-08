@@ -27,10 +27,11 @@ gulp.task('lint', () => {
 gulp.task('test', ['jade'], () => {
   browserSync.init({
     server: {
-      baseDir: ['.'],
+      baseDir: ['.', 'src'],
       index: '.tmp/index.html',
     },
   });
+  gulp.watch('src/**.js').on('change', browserSync.reload);
 });
 
 gulp.task('default', ['lint'], () => {

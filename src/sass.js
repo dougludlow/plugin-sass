@@ -1,39 +1,20 @@
-import 'fetch';
-import url from 'url';
-import sass from 'sass.js';
-
-let urlBase;
-
-// intercept file loading requests (@import directive) from libsass
-sass.importer((request, done) => {
-  const importUrl = url.resolve(urlBase, `${request.current}.scss`);
-  fetch(importUrl)
-    .then(response => response.text())
-    .then(content => done({ content }));
-});
-
-const compile = scss => {
-  return new Promise((resolve, reject) => {
-    sass.compile(scss, result => {
-      if (result.status === 0) {
-        const style = document.createElement('style');
-        style.textContent = result.text;
-        style.setAttribute('type', 'text/css');
-        document.getElementsByTagName('head')[0].appendChild(style);
-        resolve('');
-      } else {
-        reject(result.formatted);
-      }
-    });
-  });
-};
-
-const scssFetch = load => {
-  urlBase = load.address;
-  // fetch initial scss file
-  return fetch(urlBase)
-    .then(response => response.text())
-    .then(compile);
-};
-
-export {scssFetch as fetch};
+if (typeof window !== 'undefined') {
+  exports.fetch = function(load) {
+    return System.import('./sass-inject')
+      .then(function(inject) {
+        return inject(load);
+      });
+  };
+} else {
+  // setting format = 'defined' means we're managing our own output
+  exports.translate = function(load) {
+    load.metadata.format = 'defined';
+  };
+  exports.bundle = function(loads, opts) {
+    var loader = this;
+    return loader.import('./sass-builder', { name: module.id })
+      .then(function(builder) {
+        return builder.call(loader, loads, opts)
+      });
+  };
+}
