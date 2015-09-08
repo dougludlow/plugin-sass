@@ -1,4 +1,5 @@
 import browserSyncModule from 'browser-sync';
+import Builder from 'systemjs-builder';
 import del from 'del';
 import eslint from 'gulp-eslint';
 import gulp from 'gulp';
@@ -12,9 +13,19 @@ gulp.task('clean', () => {
 });
 
 gulp.task('jade', () => {
-  return gulp.src('test/index.jade')
+  return gulp.src('test/*.jade')
     .pipe(jade())
     .pipe(gulp.dest('.tmp'));
+});
+
+gulp.task('bundle', () => {
+  const builder = new Builder();
+  builder.loadConfig('./config.js');
+  return builder.build('test/bundleme.js', '.tmp/bundle.js')
+    .then(() => {
+      return gulp.src(['config.js', 'jspm_packages/system.js'])
+        .pipe(gulp.dest('.tmp'));
+    });
 });
 
 gulp.task('lint', () => {
@@ -24,11 +35,21 @@ gulp.task('lint', () => {
     .pipe(eslint.failOnError());
 });
 
-gulp.task('test', ['jade'], () => {
+gulp.task('test:runtime', ['jade'], () => {
   browserSync.init({
     server: {
       baseDir: ['.', 'src'],
-      index: '.tmp/index.html',
+      index: '.tmp/runtime-test.html',
+    },
+  });
+  gulp.watch('src/**.js').on('change', browserSync.reload);
+});
+
+gulp.task('test:bundle', ['jade', 'bundle'], () => {
+  browserSync.init({
+    server: {
+      baseDir: ['.tmp'],
+      index: 'bundle-test.html',
     },
   });
   gulp.watch('src/**.js').on('change', browserSync.reload);

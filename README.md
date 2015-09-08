@@ -31,9 +31,19 @@ $ npm install -g gulp
 $ npm install
 ...
 $ jspm install
-...
-$ gulp test
 ```
 
-Now you can open [http://localhost:3000](http://localhost:3000) in the browser
+Now you can test runtime compilation
+
+```sh
+$ gulp test:runtime
+```
+
+or bundling
+
+```sh
+$ gulp test:bundle
+```
+
+After that open [http://localhost:3000](http://localhost:3000) in the browser
 of your choice.

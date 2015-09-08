@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title Test
+    meta(charset='utf-8')
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    script(src='system.js')
+    script(src='config.js')
+    script(src='bundle.js')
+    script(type='text/javascript').
+      System.import('test/bundleme')
+        .then(() => {
+          document.body.innerHTML += '<h2>Loading done</h2>';
+        });
+  body
+    h1 I should become blue and background should become green
+    h2 Loading...

@@ -31,7 +31,8 @@
     "gulp-eslint": "^1.0.0",
     "gulp-jade": "^1.1.0",
     "gulp-notify": "^2.2.0",
-    "jspm": "^0.16.2"
+    "jspm": "^0.16.2",
+    "systemjs-builder": "^0.13.5"
   },
   "dependencies": {},
   "jspm": {
