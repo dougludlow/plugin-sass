@@ -1,26 +1,22 @@
-require('fetch');
-var url = require('url');
-var sass = require('sass.js');
+import 'fetch';
+import url from 'url';
+import sass from 'sass.js';
 
-var urlBase;
+let urlBase;
 
 // intercept file loading requests (@import directive) from libsass
-sass.importer(function(request, done) {
-  var importUrl = url.resolve(urlBase, request.current + '.scss');
+sass.importer((request, done) => {
+  const importUrl = url.resolve(urlBase, request.current + '.scss');
   fetch(importUrl)
-    .then(function(response) {
-      return response.text()
-    })
-    .then(function(content) {
-      done({ content: content });
-    });
+    .then(response => response.text())
+    .then(content => done({ content }));
 });
 
-var compile = function(scss) {
-  return new Promise(function(resolve, reject) {
-    sass.compile(scss, function(result) {
+const compile = scss => {
+  return new Promise((resolve, reject) => {
+    sass.compile(scss, result => {
       if (result.status === 0) {
-        var style = document.createElement('style');
+        const style = document.createElement('style');
         style.textContent = result.text;
         style.setAttribute('type', 'text/css');
         document.getElementsByTagName('head')[0].appendChild(style);
@@ -32,14 +28,12 @@ var compile = function(scss) {
   });
 };
 
-var scssFetch = function(load) {
+const scssFetch = load => {
   urlBase = load.address;
   // fetch initial scss file
   return fetch(urlBase)
-    .then(function(response) {
-      return response.text();
-    })
+    .then(response => response.text())
     .then(compile);
 };
 
-module.exports = scssFetch;
+export default scssFetch;
