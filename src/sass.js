@@ -4,7 +4,7 @@ let bundle;
 
 if (typeof window !== 'undefined') {
   fetch = load => {
-    return System.import('./sass-inject')
+    return System.import('./sass-inject',  { name: __moduleName })
       .then(inject => inject.default(load));
   };
 } else {

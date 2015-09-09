@@ -1,9 +1,9 @@
 {
   "name": "plugin-sass",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "SystemJS SASS loader plugin",
   "registry": "jspm",
-  "main": "./src/sass.js",
+  "main": "sass.js",
   "scripts": {
     "prepublish": "gulp",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -36,7 +36,9 @@
   },
   "dependencies": {},
   "jspm": {
-    "directories": {},
+    "directories": {
+      "lib": "src"
+    },
     "dependencies": {
       "fetch": "npm:whatwg-fetch@^0.9.0",
       "fs": "github:jspm/nodelibs-fs@^0.1.2",
