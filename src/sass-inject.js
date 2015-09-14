@@ -1,6 +1,7 @@
 import 'fetch';
 import url from 'url';
 import sass from 'sass.js';
+import fs from 'fs';
 
 let urlBase;
 
