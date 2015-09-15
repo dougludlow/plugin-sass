@@ -1,6 +1,7 @@
 import 'fetch';
 import url from 'url';
 import sass from 'sass.js';
+import fs from 'fs';
 
 let urlBase;
 
@@ -29,11 +30,27 @@ const compile = scss => {
 };
 
 const scssFetch = load => {
-  urlBase = load.address;
-  // fetch initial scss file
-  return fetch(urlBase)
-    .then(response => response.text())
-    .then(compile);
+    urlBase = load.address;
+
+    if (urlBase.indexOf('file://') > -1) {
+        return new Promise((resolve, reject) => {
+            let url = urlBase.slice('file://'.length);
+            fs.readFile(url, 'utf8', (err, data) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(data);
+                }
+            });
+        }).then(compile);
+    }
+    else {
+        // fetch initial scss file
+        return fetch(urlBase)
+        .then(response => response.text())
+        .then(compile);
+    }
 };
 
 export default scssFetch;
