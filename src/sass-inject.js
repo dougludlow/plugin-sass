@@ -36,8 +36,6 @@ const scssFetch = load => {
         return new Promise((resolve, reject) => {
             let url = urlBase.slice('file://'.length);
             fs.readFile(url, 'utf8', (err, data) => {
-                console.log(data);
-
                 if (err) {
                     reject(err);
                 }
