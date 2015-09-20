@@ -21,7 +21,7 @@ gulp.task('jade', () => {
 gulp.task('bundle', () => {
   const builder = new Builder();
   builder.loadConfig('./config.js');
-  return builder.build('test/bundleme.js', '.tmp/bundle.js')
+  return builder.bundle('test/bundleme.js', '.tmp/bundle.js')
     .then(() => {
       return gulp.src(['config.js', 'jspm_packages/system.js'])
         .pipe(gulp.dest('.tmp'));
@@ -31,7 +31,7 @@ gulp.task('bundle', () => {
 gulp.task('lint', () => {
   // Can't use ES2015 in sass-builder.js at the moment
   // See https://github.com/systemjs/systemjs/issues/774
-  return gulp.src(['./src/**/*.js', '!./src/sass-builder.js'])
+  return gulp.src('./src/**/*.js')
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());

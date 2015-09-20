@@ -14,7 +14,7 @@ if (typeof window !== 'undefined') {
   };
   bundle = function bundler(loads, opts) {
     return System.import('./sass-builder', { name: __moduleName })
-      .then(builder => builder.call(System, loads, opts));
+      .then(builder => builder.default.call(System, loads, opts));
   };
 }
 
