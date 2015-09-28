@@ -27,6 +27,7 @@
     "eslint": "^1.5.0",
     "eslint-config-airbnb": "0.0.8",
     "eslint-plugin-react": "^3.4.2",
+    "fs-extra": "^0.24.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.0.0",
     "gulp-jade": "^1.1.0",
@@ -37,6 +38,7 @@
   "dependencies": {},
   "jspm": {
     "directories": {
+      "baseURL": "src",
       "lib": "src"
     },
     "dependencies": {

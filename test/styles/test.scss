@@ -1,7 +1,8 @@
 @import 'headings';
 
-$bodyColor: green;
+$image: '../images/sass-logo.svg';
 
 body {
-  background-color: $bodyColor;
+  background-image: url($image);
+  background-repeat: no-repeat;
 }
