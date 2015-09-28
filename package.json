@@ -31,8 +31,8 @@
     "gulp-eslint": "^1.0.0",
     "gulp-jade": "^1.1.0",
     "gulp-notify": "^2.2.0",
-    "jspm": "^0.16.6",
-    "systemjs-builder": "^0.14.3"
+    "jspm": "^0.16.10",
+    "systemjs-builder": "^0.14.6"
   },
   "dependencies": {},
   "jspm": {
@@ -46,9 +46,9 @@
       "url": "github:jspm/nodelibs-url@^0.1.0"
     },
     "devDependencies": {
-      "babel": "npm:babel-core@^5.8.22",
-      "babel-runtime": "npm:babel-runtime@^5.8.20",
-      "core-js": "npm:core-js@^1.1.0"
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4"
     }
   }
 }

@@ -1,5 +1,5 @@
 System.config({
-  baseURL: "./",
+  baseURL: "/",
   defaultJSExtensions: true,
   transpiler: "babel",
   babelOptions: {
@@ -15,8 +15,8 @@ System.config({
 
   map: {
     "babel": "npm:babel-core@5.8.25",
-    "babel-runtime": "npm:babel-runtime@5.8.24",
-    "core-js": "npm:core-js@1.1.4",
+    "babel-runtime": "npm:babel-runtime@5.8.25",
+    "core-js": "npm:core-js@1.2.0",
     "fetch": "npm:whatwg-fetch@0.9.0",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
     "sass.js": "npm:sass.js@0.9.2",
@@ -66,7 +66,7 @@ System.config({
     "npm:assert@1.3.0": {
       "util": "npm:util@0.10.3"
     },
-    "npm:babel-runtime@5.8.24": {
+    "npm:babel-runtime@5.8.25": {
       "process": "github:jspm/nodelibs-process@0.1.1"
     },
     "npm:browserify-aes@1.0.3": {
@@ -110,7 +110,7 @@ System.config({
     "npm:constants-browserify@0.0.1": {
       "systemjs-json": "github:systemjs/plugin-json@0.1.0"
     },
-    "npm:core-js@1.1.4": {
+    "npm:core-js@1.2.0": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "process": "github:jspm/nodelibs-process@0.1.1",
       "systemjs-json": "github:systemjs/plugin-json@0.1.0"
