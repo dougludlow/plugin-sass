@@ -41,9 +41,12 @@ gulp.task('bundle', () => {
 });
 
 gulp.task('lint', () => {
-  // Can't use ES2015 in sass-builder.js at the moment
-  // See https://github.com/systemjs/systemjs/issues/774
-  return gulp.src('src/**/*.js')
+  const glob = [
+    '!src/config.js',
+    '!src/jspm_packages/**',
+    'src/**/*.js',
+  ];
+  return gulp.src(glob)
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());
