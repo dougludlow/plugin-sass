@@ -27,14 +27,14 @@ sass.importer((request, done) => {
   });
 });
 
-export default loads => {
+export default (loads, compileOpts) => {
   return new Promise((resolve, reject) => {
     loads.forEach((load) => {
       // TODO Support different load addresses
       urlBase = load.address;
     });
     const stubDefines = loads.map(load => {
-      return `System\.register('${load.name}', [], false, function() {});`;
+      return `${(compileOpts.systemGlobal || 'System')}\.register('${load.name}', [], false, function() {});`;
     }).join('\n');
     const scss = loads.map(load => {
       return load.source;
