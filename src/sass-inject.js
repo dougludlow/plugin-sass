@@ -27,7 +27,7 @@ sass.importer((request, done) => {
     .then(data => content = data)
     .catch(() => loadFile(importUrl))
     .then(data => content = data)
-    .then(() => done({ content }))
+    .then(() => done({ content }));
 });
 
 const compile = scss => {

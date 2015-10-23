@@ -44,7 +44,7 @@ sass.importer((request, done) => {
     .then(data => content = data)
     .catch(() => loadFile(readImportPath))
     .then(data => content = data)
-    .then(() => done({ content }))
+    .then(() => done({ content }));
 });
 
 export default (loads, compileOpts) => {
