@@ -1,6 +1,6 @@
 {
   "name": "plugin-sass",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "SystemJS SASS loader plugin",
   "registry": "jspm",
   "main": "sass.js",
