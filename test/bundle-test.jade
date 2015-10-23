@@ -10,8 +10,11 @@ html
     script(type='text/javascript').
       System.import('test/bundleme')
         .then(() => {
-          document.body.innerHTML += '<h2>Loading done</h2>';
+            document.addEventListener('DOMContentLoaded', (event) => {
+                document.body.innerHTML += '<h2>Loading done</h2>';
+            });
         });
   body
-    h1 I should become blue and background should become green
+    h1 I should become blue and background should show a SASS logo
     h2 Loading...
+    p I SHOULD BE ALL LOWERCASE

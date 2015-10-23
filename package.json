@@ -44,6 +44,7 @@
     "dependencies": {
       "fetch": "npm:whatwg-fetch@^0.9.0",
       "fs": "github:jspm/nodelibs-fs@^0.1.2",
+      "querystring": "github:jspm/nodelibs-querystring@^0.1.0",
       "sass.js": "npm:sass.js@^0.9.2",
       "url": "github:jspm/nodelibs-url@^0.1.0"
     },
