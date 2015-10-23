@@ -1,12 +1,13 @@
-import url from 'url';
 import fs from 'fs';
+import querystring from 'querystring';
 import sass from 'sass.js';
+import url from 'url';
 
 const cssInject = "(function(c){var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})";
 
 let urlBase;
 
-function escape(source) {
+const escape = source => {
   return source
     .replace(/(["\\])/g, '\\$1')
     .replace(/[\f]/g, '\\f')
@@ -16,15 +17,34 @@ function escape(source) {
     .replace(/[\r]/g, '\\r')
     .replace(/[\u2028]/g, '\\u2028')
     .replace(/[\u2029]/g, '\\u2029');
-}
+};
+
+const loadFile = path => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, {encoding: 'UTF-8'}, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
 
 // intercept file loading requests (@import directive) from libsass
 sass.importer((request, done) => {
-  const fullUrl = url.resolve(urlBase, `${request.current}.scss`);
-  const readUrl = url.parse(fullUrl).path;
-  fs.readFile(readUrl, {encoding: 'UTF-8'}, (err, data) => {
-    done({ content: data });
-  });
+  const importUrl = url.resolve(urlBase, `${request.current}.scss`);
+  const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
+
+  const readImportPath = querystring.unescape(url.parse(importUrl).path);
+  const readPartialPath = querystring.unescape(url.parse(partialUrl).path);
+
+  let content;
+  loadFile(readPartialPath)
+    .then(data => content = data)
+    .catch(() => loadFile(readImportPath))
+    .then(data => content = data)
+    .then(() => done({ content }));
 });
 
 export default (loads, compileOpts) => {

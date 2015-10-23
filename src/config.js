@@ -20,6 +20,7 @@ System.config({
     "core-js": "npm:core-js@1.2.0",
     "fetch": "npm:whatwg-fetch@0.9.0",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
+    "querystring": "github:jspm/nodelibs-querystring@0.1.0",
     "sass.js": "npm:sass.js@0.9.2",
     "scss": "index.js",
     "url": "github:jspm/nodelibs-url@0.1.0",
@@ -43,6 +44,9 @@ System.config({
     },
     "github:jspm/nodelibs-process@0.1.1": {
       "process": "npm:process@0.10.1"
+    },
+    "github:jspm/nodelibs-querystring@0.1.0": {
+      "querystring": "npm:querystring@0.2.0"
     },
     "github:jspm/nodelibs-stream@0.1.0": {
       "stream-browserify": "npm:stream-browserify@1.0.0"

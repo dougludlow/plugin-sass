@@ -5,12 +5,29 @@ import fs from 'fs';
 
 let urlBase;
 
+const loadFile = loadUrl => {
+  return fetch(loadUrl)
+    .then(response => {
+      if (response.status === 404) {
+        throw new Error('Not found');
+      }
+      return response.text();
+    });
+};
+
 // intercept file loading requests (@import directive) from libsass
 sass.importer((request, done) => {
-  const importUrl = url.resolve(urlBase, request.current + '.scss');
-  fetch(importUrl)
-    .then(response => response.text())
-    .then(content => done({ content }));
+  const { current } = request;
+
+  const importUrl = url.resolve(urlBase, `${current}.scss`);
+  const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
+
+  let content;
+  loadFile(partialUrl)
+    .then(data => content = data)
+    .catch(() => loadFile(importUrl))
+    .then(data => content = data)
+    .then(() => done({ content }));
 });
 
 const compile = scss => {
