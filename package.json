@@ -1,9 +1,9 @@
 {
   "name": "plugin-sass",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "SystemJS SASS loader plugin",
   "registry": "jspm",
-  "main": "sass.js",
+  "main": "index.js",
   "scripts": {
     "prepublish": "gulp",
     "test": "echo \"Error: no test specified\" && exit 1"
