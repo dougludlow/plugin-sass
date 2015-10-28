@@ -1,10 +1,23 @@
 import 'fetch';
 import url from 'url';
-import Sass from 'sass.js/dist/sass';
 import fs from 'fs';
 
-const sass = new Sass();
 let urlBase;
+
+window.Worker = null;
+
+const Sass = new Promise((resolve, reject) => {
+  let _sass;
+  if (typeof window.Worker === 'function') {
+    System.import('sassjs/dist/sass').then(sass => {
+      resolve(new sass());
+    }).catch(err => reject(err));
+  } else {
+    System.import('sassjs/dist/sass.sync').then(sass => {
+      resolve(sass);
+    });
+  }
+});
 
 const loadFile = loadUrl => {
   return fetch(loadUrl)
@@ -17,33 +30,38 @@ const loadFile = loadUrl => {
 };
 
 // intercept file loading requests (@import directive) from libsass
-sass.importer((request, done) => {
-  const { current } = request;
+Sass.then((sass) => {
+  sass.importer((request, done) => {
+    const { current } = request;
 
-  const importUrl = url.resolve(urlBase, `${current}.scss`);
-  const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
+    const importUrl = url.resolve(urlBase, `${current}.scss`);
+    const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
 
-  let content;
-  loadFile(partialUrl)
-    .then(data => content = data)
-    .catch(() => loadFile(importUrl))
-    .then(data => content = data)
-    .then(() => done({ content }));
+    let content;
+    loadFile(partialUrl)
+      .then(data => content = data)
+      .catch(() => loadFile(importUrl))
+      .then(data => content = data)
+      .then(() => done({ content }));
+  });
 });
+
 
 const compile = scss => {
   return new Promise((resolve, reject) => {
-    sass.compile(scss, result => {
-      if (result.status === 0) {
-        const style = document.createElement('style');
-        style.textContent = result.text;
-        style.setAttribute('type', 'text/css');
-        document.getElementsByTagName('head')[0].appendChild(style);
-        resolve('');
-      } else {
-        reject(result.formatted);
-      }
-    });
+    Sass.then(sass => {
+      sass.compile(scss, result => {
+        if (result.status === 0) {
+          const style = document.createElement('style');
+          style.textContent = result.text;
+          style.setAttribute('type', 'text/css');
+          document.getElementsByTagName('head')[0].appendChild(style);
+          resolve('');
+        } else {
+          reject(result.formatted);
+        }
+      });
+    })
   });
 };
 
