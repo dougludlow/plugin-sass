@@ -1,8 +1,9 @@
 import 'fetch';
 import url from 'url';
-import sass from 'sass.js';
+import Sass from 'sass.js/dist/sass';
 import fs from 'fs';
 
+const sass = new Sass();
 let urlBase;
 
 const loadFile = loadUrl => {
