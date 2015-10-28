@@ -7,11 +7,11 @@ let urlBase;
 const Sass = new Promise((resolve, reject) => {
   let _sass;
   if (typeof window.Worker === 'function') {
-    System.import('sass.js/dist/sass').then(sass => {
+    System.import('sass.js/dist/sass', __moduleName).then(sass => {
       resolve(new sass());
     }).catch(err => reject(err));
   } else {
-    System.import('sass.js/dist/sass.sync').then(sass => {
+    System.import('sass.js/dist/sass.sync', __moduleName).then(sass => {
       resolve(sass);
     });
   }
