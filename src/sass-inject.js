@@ -4,8 +4,6 @@ import fs from 'fs';
 
 let urlBase;
 
-window.Worker = null;
-
 const Sass = new Promise((resolve, reject) => {
   let _sass;
   if (typeof window.Worker === 'function') {
