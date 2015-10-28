@@ -21,7 +21,7 @@ System.config({
     "fetch": "npm:whatwg-fetch@0.9.0",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
     "querystring": "github:jspm/nodelibs-querystring@0.1.0",
-    "sassjs": "npm:sass.js@0.9.4",
+    "sass.js": "npm:sass.js@0.9.4",
     "scss": "index.js",
     "url": "github:jspm/nodelibs-url@0.1.0",
     "github:jspm/nodelibs-assert@0.1.0": {

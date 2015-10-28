@@ -1,6 +1,6 @@
 import fs from 'fs';
 import querystring from 'querystring';
-import sass from 'sassjs';
+import sass from 'sass.js';
 import url from 'url';
 
 const cssInject = "(function(c){var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})";
