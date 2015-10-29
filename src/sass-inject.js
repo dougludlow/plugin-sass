@@ -4,15 +4,14 @@ import fs from 'fs';
 
 let urlBase;
 
-const Sass = new Promise((resolve, reject) => {
-  let _sass;
+const importSass = new Promise((resolve, reject) => {
   if (typeof window.Worker === 'function') {
-    System.import('sass.js/dist/sass', __moduleName).then(sass => {
-      resolve(new sass());
+    System.import('sass.js/dist/sass', __moduleName).then(Sass => {
+      resolve(new Sass());
     }).catch(err => reject(err));
   } else {
-    System.import('sass.js/dist/sass.sync', __moduleName).then(sass => {
-      resolve(sass);
+    System.import('sass.js/dist/sass.sync', __moduleName).then(Sass => {
+      resolve(Sass);
     });
   }
 });
@@ -28,7 +27,7 @@ const loadFile = loadUrl => {
 };
 
 // intercept file loading requests (@import directive) from libsass
-Sass.then((sass) => {
+importSass.then((sass) => {
   sass.importer((request, done) => {
     const { current } = request;
 
@@ -47,7 +46,7 @@ Sass.then((sass) => {
 
 const compile = scss => {
   return new Promise((resolve, reject) => {
-    Sass.then(sass => {
+    importSass.then(sass => {
       sass.compile(scss, result => {
         if (result.status === 0) {
           const style = document.createElement('style');
@@ -59,7 +58,7 @@ const compile = scss => {
           reject(result.formatted);
         }
       });
-    })
+    });
   });
 };
 
