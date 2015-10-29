@@ -39,10 +39,16 @@ Now you can test runtime compilation
 $ gulp test:runtime
 ```
 
-or bundling
+bundling
 
 ```sh
 $ gulp test:bundle
+```
+
+or static bundling
+
+```sh
+$ gulp test:bundleStatic
 ```
 
 After that open [http://localhost:3000](http://localhost:3000) in the browser
