@@ -8,18 +8,7 @@ import jade from 'gulp-jade';
 import notify from 'gulp-notify';
 
 const browserSync = browserSyncModule.create();
-
-gulp.task('clean', () => {
-  return del('.tmp');
-});
-
-gulp.task('jade', () => {
-  return gulp.src('test/*.jade')
-    .pipe(jade())
-    .pipe(gulp.dest('.tmp'));
-});
-
-gulp.task('bundle', () => {
+const bundle = (buildStatic = false) => {
   const copyFiles = new Promise((resolve, reject) => {
     fse.copy('src/config.js', '.tmp/config.js', err => {
       if (err) {
@@ -35,9 +24,27 @@ gulp.task('bundle', () => {
       }
     });
   });
-  const build = new Builder('src', 'src/config.js')
-    .bundle('test/bundleme', '.tmp/bundle.js');
+  const builder = new Builder('src', 'src/config.js');
+  const build = builder[buildStatic ? 'buildStatic' : 'bundle']('test/bundleme', '.tmp/bundle.js');
   return Promise.all([build, copyFiles]);
+};
+
+gulp.task('clean', () => {
+  return del('.tmp');
+});
+
+gulp.task('jade', ['clean'], () => {
+  return gulp.src('test/*.jade')
+    .pipe(jade())
+    .pipe(gulp.dest('.tmp'));
+});
+
+gulp.task('bundle', ['clean'], () => {
+  return bundle();
+});
+
+gulp.task('bundleStatic', ['clean'], () => {
+  return bundle(true);
 });
 
 gulp.task('lint', () => {
@@ -67,6 +74,16 @@ gulp.task('test:bundle', ['jade', 'bundle'], () => {
     server: {
       baseDir: ['.tmp', 'test'],
       index: 'bundle-test.html',
+    },
+  });
+  gulp.watch('src/**.js').on('change', browserSync.reload);
+});
+
+gulp.task('test:bundleStatic', ['jade', 'bundleStatic'], () => {
+  browserSync.init({
+    server: {
+      baseDir: ['.tmp', 'test'],
+      index: 'bundle-static-test.html',
     },
   });
   gulp.watch('src/**.js').on('change', browserSync.reload);
