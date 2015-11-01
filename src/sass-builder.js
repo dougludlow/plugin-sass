@@ -35,10 +35,8 @@ const loadFile = path => {
 sass.importer((request, done) => {
   const importUrl = url.resolve(urlBase, `${request.current}.scss`);
   const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-
   const readImportPath = querystring.unescape(url.parse(importUrl).path);
   const readPartialPath = querystring.unescape(url.parse(partialUrl).path);
-
   let content;
   loadFile(readPartialPath)
     .then(data => content = data)

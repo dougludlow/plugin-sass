@@ -6,6 +6,8 @@ import fse from 'fs-extra';
 import gulp from 'gulp';
 import jade from 'gulp-jade';
 import notify from 'gulp-notify';
+import modernizr from 'gulp-modernizr';
+import uglify from 'gulp-uglify';
 
 const browserSync = browserSyncModule.create();
 const bundle = (buildStatic = false) => {
@@ -59,7 +61,20 @@ gulp.task('lint', () => {
     .pipe(eslint.failOnError());
 });
 
-gulp.task('test:runtime', ['jade'], () => {
+gulp.task('modernizr', () => {
+  const glob = [
+    '!src/config.js',
+    '!src/modernizr.js',
+    '!src/jspm_packages/**',
+    'src/**/*.js',
+  ];
+  return gulp.src(glob)
+    .pipe(modernizr())
+    .pipe(uglify())
+    .pipe(gulp.dest('src'));
+});
+
+gulp.task('test:runtime', ['jade', 'modernizr'], () => {
   browserSync.init({
     server: {
       index: 'runtime-test.html',
@@ -89,7 +104,7 @@ gulp.task('test:bundleStatic', ['jade', 'bundleStatic'], () => {
   gulp.watch('src/**.js').on('change', browserSync.reload);
 });
 
-gulp.task('default', ['lint'], () => {
+gulp.task('default', ['lint', 'modernizr'], () => {
   return gulp.src('.')
     .pipe(notify({
       message: 'Successfully build',

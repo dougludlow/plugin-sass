@@ -1,11 +1,12 @@
 import 'fetch';
-import url from 'url';
+import './modernizr';
 import fs from 'fs';
+import url from 'url';
 
 let urlBase;
 
 const importSass = new Promise((resolve, reject) => {
-  if (typeof window.Worker === 'function') {
+  if (Modernizr.webworkers) {
     System.import('sass.js/dist/sass', __moduleName).then(Sass => {
       resolve(new Sass());
     }).catch(err => reject(err));
