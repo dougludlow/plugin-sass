@@ -52,6 +52,7 @@ gulp.task('bundleStatic', ['clean'], () => {
 gulp.task('lint', () => {
   const glob = [
     '!src/config.js',
+    '!src/modernizr.js',
     '!src/jspm_packages/**',
     'src/**/*.js',
   ];
