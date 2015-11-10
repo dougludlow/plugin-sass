@@ -28,7 +28,7 @@ const loadFile = loadUrl => {
 };
 
 // intercept file loading requests (@import directive) from libsass
-importSass.then((sass) => {
+importSass.then(sass => {
   sass.importer((request, done) => {
     const { current } = request;
 
@@ -65,16 +65,12 @@ const compile = scss => {
 
 export default load => {
   urlBase = load.address;
-  if (urlBase.indexOf('file://') > -1) {
-    return new Promise((resolve, reject) => {
+  if (urlBase.startsWith('file://')) {
+    return new Promise(resolve => {
       const slicedUrl = urlBase.slice('file://'.length);
-      fs.readFile(slicedUrl, 'utf8', (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      });
+      // at Cordova runtime only readFileSync() is available
+      const data = fs.readFileSync(slicedUrl);
+      resolve(data);
     }).then(compile);
   }
   // fetch initial scss file
