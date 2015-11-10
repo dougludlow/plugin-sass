@@ -63,7 +63,7 @@ const compile = scss => {
   });
 };
 
-const scssFetch = load => {
+export default load => {
   urlBase = load.address;
   if (urlBase.indexOf('file://') > -1) {
     return new Promise((resolve, reject) => {
@@ -82,5 +82,3 @@ const scssFetch = load => {
     .then(response => response.text())
     .then(compile);
 };
-
-export default scssFetch;
