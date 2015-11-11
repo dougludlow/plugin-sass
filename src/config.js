@@ -1,5 +1,5 @@
 System.config({
-  baseURL: ".",
+  baseURL: "./",
   defaultJSExtensions: true,
   transpiler: "babel",
   babelOptions: {
@@ -18,9 +18,9 @@ System.config({
     "babel": "npm:babel-core@5.8.25",
     "babel-runtime": "npm:babel-runtime@5.8.25",
     "core-js": "npm:core-js@1.2.0",
-    "fetch": "npm:whatwg-fetch@0.9.0",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
     "querystring": "github:jspm/nodelibs-querystring@0.1.0",
+    "reqwest": "github:ded/reqwest@2.0.5",
     "sass.js": "npm:sass.js@0.9.4",
     "scss": "index.js",
     "url": "github:jspm/nodelibs-url@0.1.0",

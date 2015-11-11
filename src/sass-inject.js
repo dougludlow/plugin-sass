@@ -1,7 +1,6 @@
-import 'fetch';
-import './modernizr';
-import fs from 'fs';
+import reqwest from 'reqwest';
 import url from 'url';
+import './modernizr';
 
 let urlBase;
 
@@ -13,33 +12,29 @@ const importSass = new Promise((resolve, reject) => {
   } else {
     System.import('sass.js/dist/sass.sync', __moduleName).then(Sass => {
       resolve(Sass);
-    });
+    }).catch(err => reject(err));
   }
 });
 
-const loadFile = loadUrl => {
-  return fetch(loadUrl)
-    .then(response => {
-      if (response.status === 404) {
-        throw new Error('Not found');
-      }
-      return response.text();
-    });
-};
 
 // intercept file loading requests (@import directive) from libsass
 importSass.then(sass => {
   sass.importer((request, done) => {
     const { current } = request;
-
     const importUrl = url.resolve(urlBase, `${current}.scss`);
     const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-
     let content;
-    loadFile(partialUrl)
-      .then(data => content = data)
-      .catch(() => loadFile(importUrl))
-      .then(data => content = data)
+    reqwest(partialUrl)
+      .then(resp => {
+        // In Cordova Apps the response is the raw XMLHttpRequest
+        content = resp.responseText ? resp.responseText : resp;
+        return content;
+      })
+      .catch(() => reqwest(importUrl))
+      .then(resp => {
+        content = resp.responseText ? resp.responseText : resp;
+        return content;
+      })
       .then(() => done({ content }));
   });
 });
@@ -65,16 +60,9 @@ const compile = scss => {
 
 export default load => {
   urlBase = load.address;
-  if (urlBase.startsWith('file://')) {
-    return new Promise(resolve => {
-      const slicedUrl = urlBase.slice('file://'.length);
-      // at Cordova runtime only readFileSync() is available
-      const data = fs.readFileSync(slicedUrl);
-      resolve(data);
-    }).then(compile);
-  }
-  // fetch initial scss file
-  return fetch(urlBase)
-    .then(response => response.text())
+  // load initial scss file
+  return reqwest(urlBase)
+    // In Cordova Apps the response is the raw XMLHttpRequest
+    .then(resp => resp.responseText ? resp.responseText : resp)
     .then(compile);
 };

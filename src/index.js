@@ -9,7 +9,9 @@ if (typeof window !== 'undefined') {
   };
 } else {
   // setting format = 'defined' means we're managing our own output
-  translate = load => load.metadata.format = 'defined';
+  translate = load => {
+    load.metadata.format = 'defined';
+  };
   bundle = function bundler(loads, opts) {
     return System.import('./sass-builder', { name: __moduleName })
       .then(builder => builder.default.call(System, loads, opts));

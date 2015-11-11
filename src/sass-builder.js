@@ -54,11 +54,9 @@ export default (loads, compileOpts) => {
     const stubDefines = loads.map(load => {
       return `${(compileOpts.systemGlobal || 'System')}\.register('${load.name}', [], false, function() {});`;
     }).join('\n');
-    const scss = loads.map(load => {
-      return load.source;
-    }).reduce((sourceA, sourceB) => {
-      return sourceA + sourceB;
-    });
+    const scss = loads
+      .map(load => load.source)
+      .reduce((sourceA, sourceB) => sourceA + sourceB);
     const options = {
       style: sass.style.compressed,
     };
