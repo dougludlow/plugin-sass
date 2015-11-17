@@ -21,6 +21,8 @@ const importSass = new Promise((resolve, reject) => {
 importSass.then(sass => {
   sass.importer((request, done) => {
     const { current } = request;
+    // Currently only supporting scss imports due to
+    // https://github.com/sass/libsass/issues/1695
     const importUrl = url.resolve(urlBase, `${current}.scss`);
     const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
     let content;
@@ -43,7 +45,7 @@ importSass.then(sass => {
 const compile = scss => {
   return new Promise((resolve, reject) => {
     importSass.then(sass => {
-      sass.compile(scss, result => {
+      sass.compile(scss.content, scss.options, result => {
         if (result.status === 0) {
           const style = document.createElement('style');
           style.textContent = result.text;
@@ -60,9 +62,13 @@ const compile = scss => {
 
 export default load => {
   urlBase = load.address;
+  let indentedSyntax = urlBase.split('.').slice(-1)[0] == 'sass'
   // load initial scss file
   return reqwest(urlBase)
     // In Cordova Apps the response is the raw XMLHttpRequest
-    .then(resp => resp.responseText ? resp.responseText : resp)
+    .then(resp => { return {
+      content: (resp.responseText ? resp.responseText : resp),
+      options: { indentedSyntax }
+    }})
     .then(compile);
 };

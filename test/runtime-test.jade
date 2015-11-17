@@ -8,10 +8,12 @@ html
     script(src='config.js')
     script(type='text/javascript').
       System.import('styles/test.scss!')
+        .then(() => System.import('styles/test_sass.sass!scss'))
+        .then(() => System.import('styles/test_other.scss!'))
         .then(() => {
           document.body.innerHTML += '<h2>Loading done</h2>';
         });
   body
-    h1 I should become blue and background should show a SASS logo
+    h1 I should become blue and background should show a SASS logo on a white background
     h2 Loading...
-    p I SHOULD BE ALL LOWERCASE
+    p I SHOULD BE ALL LOWERCASE UNDERLINED AND CENTERED

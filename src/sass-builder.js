@@ -33,6 +33,8 @@ const loadFile = path => {
 
 // intercept file loading requests (@import directive) from libsass
 sass.importer((request, done) => {
+// Currently only supporting scss imports due to
+// https://github.com/sass/libsass/issues/1695
   const importUrl = url.resolve(urlBase, `${request.current}.scss`);
   const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
   const readImportPath = querystring.unescape(url.parse(importUrl).path);
@@ -46,26 +48,31 @@ sass.importer((request, done) => {
 });
 
 export default (loads, compileOpts) => {
-  return new Promise((resolve, reject) => {
-    loads.forEach((load) => {
-      // TODO Support different load addresses
+  const stubDefines = loads.map(load => {
+    return `${(compileOpts.systemGlobal || 'System')}\.register('${load.name}', [], false, function() {});`;
+  }).join('\n');
+
+  const compile_promise = load => {
+    return new Promise((resolve, reject) => {
       urlBase = load.address;
+      const options = {
+        style: sass.style.compressed,
+        indentedSyntax: urlBase.split('.').slice(-1)[0] == 'sass'
+      };
+      sass.compile(load.source, options, result => {
+        if (result.status === 0) {
+          resolve(result.text);
+        } else {
+          reject(result.formatted);
+        }
+      });
     });
-    const stubDefines = loads.map(load => {
-      return `${(compileOpts.systemGlobal || 'System')}\.register('${load.name}', [], false, function() {});`;
-    }).join('\n');
-    const scss = loads
-      .map(load => load.source)
-      .reduce((sourceA, sourceB) => sourceA + sourceB);
-    const options = {
-      style: sass.style.compressed,
-    };
-    sass.compile(scss, options, result => {
-      if (result.status === 0) {
-        resolve([stubDefines, cssInject, `("${escape(result.text)}");`].join('\n'));
-      } else {
-        reject(result.formatted);
-      }
-    });
+  };
+  return new Promise((resolve, reject) => {
+    // Keep style order
+    Promise.all(loads.map(compile_promise))
+    .then(
+      response => resolve([stubDefines, cssInject, `("${escape(response.reverse().join(''))}");`].join('\n')),
+      reason => reject(reason));
   });
 };
