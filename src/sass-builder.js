@@ -34,8 +34,8 @@ const loadFile = path => {
 
 // intercept file loading requests (@import directive) from libsass
 sass.importer((request, done) => {
-// Currently only supporting scss imports due to
-// https://github.com/sass/libsass/issues/1695
+  // Currently only supporting scss imports due to
+  // https://github.com/sass/libsass/issues/1695
   const importUrl = url.resolve(urlBase, `${request.current}.scss`);
   const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
   const readImportPath = querystring.unescape(url.parse(importUrl).path);
