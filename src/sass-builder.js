@@ -53,12 +53,12 @@ export default (loads, compileOpts) => {
     return `${(compileOpts.systemGlobal || 'System')}\.register('${load.name}', [], false, function() {});`;
   }).join('\n');
 
-  const compile_promise = load => {
+  const compilePromise = load => {
     return new Promise((resolve, reject) => {
       urlBase = load.address;
       const options = {
         style: sass.style.compressed,
-        indentedSyntax: urlBase.split('.').slice(-1)[0] == 'sass'
+        indentedSyntax: urlBase.endsWith('.sass'),
       };
       sass.compile(load.source, options, result => {
         if (result.status === 0) {
@@ -71,7 +71,7 @@ export default (loads, compileOpts) => {
   };
   return new Promise((resolve, reject) => {
     // Keep style order
-    Promise.all(loads.map(compile_promise))
+    Promise.all(loads.map(compilePromise))
     .then(
       response => resolve([stubDefines, cssInject, `("${escape(response.reverse().join(''))}");`].join('\n')),
       reason => reject(reason));

@@ -62,13 +62,15 @@ const compile = scss => {
 
 export default load => {
   urlBase = load.address;
-  let indentedSyntax = urlBase.split('.').slice(-1)[0] == 'sass'
+  const indentedSyntax = urlBase.endsWith('.sass');
   // load initial scss file
   return reqwest(urlBase)
     // In Cordova Apps the response is the raw XMLHttpRequest
-    .then(resp => { return {
-      content: (resp.responseText ? resp.responseText : resp),
-      options: { indentedSyntax }
-    }})
+    .then(resp => {
+      return {
+        content: (resp.responseText ? resp.responseText : resp),
+        options: { indentedSyntax },
+      };
+    })
     .then(compile);
 };
