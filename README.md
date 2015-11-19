@@ -23,6 +23,13 @@ or synchronously
 import './style.scss!';
 ```
 
+You can also use the [older syntax](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#syntax)
+, known as the indented syntax (or sometimes just "_Sass_")
+
+```js
+System.import('./style.sass!scss');
+```
+
 ## Testing the plugin
 
 ```sh
