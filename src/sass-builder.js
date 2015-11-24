@@ -32,14 +32,19 @@ const loadFile = path => {
   });
 };
 
+const parseUnescape = uri => {
+  // Node doesn't understand Windows' local file urls
+  return (uri.match(/^file:\/\/\//)) ? uri.replace(/^file:\/\/\//, '') : querystring.unescape(url.parse(uri).path);
+};
+
 // intercept file loading requests (@import directive) from libsass
 sass.importer((request, done) => {
   // Currently only supporting scss imports due to
   // https://github.com/sass/libsass/issues/1695
   const importUrl = url.resolve(urlBase, `${request.current}.scss`);
   const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-  const readImportPath = querystring.unescape(url.parse(importUrl).path);
-  const readPartialPath = querystring.unescape(url.parse(partialUrl).path);
+  const readImportPath = parseUnescape(importUrl);
+  const readPartialPath = parseUnescape(partialUrl);
   let content;
   loadFile(readPartialPath)
     .then(data => content = data)
