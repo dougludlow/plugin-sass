@@ -1,6 +1,7 @@
 import reqwest from 'reqwest';
 import url from 'url';
 import './modernizr';
+import resolvePath from './resolve-path';
 
 let urlBase;
 
@@ -16,31 +17,12 @@ const importSass = new Promise((resolve, reject) => {
   }
 });
 
-const resolveImportUrl = (request) => {
-  const { previous } = request;
-  let { current } = request;
-  return new Promise((resolve, reject) => {
-    if (previous !== 'stdin' && current.substr(0, 5) !== 'jspm:') {
-      current = url.resolve(previous, current);
-    }
-    if (current.substr(0, 5) === 'jspm:') {
-      const jspmUrl = current.replace(/^jspm:/, '') + '.scss';
-      System.normalize(jspmUrl)
-        .then(normalizedUrl => resolve(normalizedUrl.replace(/\.js$|\.ts$/, '')))
-        .catch(e => reject(e));
-    } else {
-      const resolvedUrl = url.resolve(urlBase, `${current}.scss`);
-      resolve(resolvedUrl);
-    }
-  });
-};
-
 const sassImporter = (request, done) => {
   let path;
   let content;
   // Currently only supporting scss imports due to
   // https://github.com/sass/libsass/issues/1695
-  resolveImportUrl(request).then(resolvedUrl => {
+  resolvePath(request, urlBase).then(resolvedUrl => {
     path = resolvedUrl;
     const partialPath = path.replace(/\/([^/]*)$/, '/_$1');
     return reqwest(partialPath);
