@@ -34,7 +34,9 @@ const loadFile = path => {
 
 const parseUnescape = uri => {
   // Node doesn't understand Windows' local file urls
-  return (uri.match(/^file:\/\/\//)) ? uri.replace(/^file:\/\/\//, '') : querystring.unescape(url.parse(uri).path);
+  // TODO: does not work in Linux / Mac OS X
+  // return (uri.match(/^file:\/\/\//)) ? uri.replace(/^file:\/\/\//, '') : querystring.unescape(url.parse(uri).path);
+  return querystring.unescape(url.parse(uri).path);
 };
 
 // intercept file loading requests (@import directive) from libsass
