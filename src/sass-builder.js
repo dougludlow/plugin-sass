@@ -67,6 +67,10 @@ export default (loads, compileOpts) => {
         style: sass.style.compressed,
         indentedSyntax: urlBase.endsWith('.sass'),
       };
+      // Occurs on empty files
+      if (!load.source) {
+        return resolve('');
+      }
       sass.compile(load.source, options, result => {
         if (result.status === 0) {
           resolve(result.text);
