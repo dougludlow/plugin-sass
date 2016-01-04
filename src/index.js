@@ -1,10 +1,11 @@
+/* global __moduleName */
 let fetch;
 let translate;
 let bundle;
 
 if (typeof window !== 'undefined') {
   fetch = load => {
-    return System.import('./sass-inject',  { name: __moduleName })
+    return System.import('./sass-inject', { name: __moduleName })
       .then(inject => inject.default(load));
   };
 } else {
@@ -18,4 +19,4 @@ if (typeof window !== 'undefined') {
   };
 }
 
-export {fetch, translate, bundle};
+export { fetch, translate, bundle };

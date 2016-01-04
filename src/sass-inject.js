@@ -1,3 +1,4 @@
+/* global Modernizr __moduleName */
 import './modernizr';
 import isEmpty from 'lodash/lang/isEmpty';
 import isString from 'lodash/lang/isString';
