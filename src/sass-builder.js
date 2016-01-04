@@ -1,4 +1,5 @@
 import fs from 'fs';
+import isEmpty from 'lodash/lang/isEmpty';
 import querystring from 'querystring';
 import sass from 'sass.js';
 import url from 'url';
@@ -68,7 +69,7 @@ export default (loads, compileOpts) => {
         indentedSyntax: urlBase.endsWith('.sass'),
       };
       // Occurs on empty files
-      if (!load.source) {
+      if (isEmpty(load.source)) {
         return resolve('');
       }
       sass.compile(load.source, options, result => {

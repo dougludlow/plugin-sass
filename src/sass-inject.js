@@ -1,6 +1,9 @@
+import './modernizr';
+import isEmpty from 'lodash/lang/isEmpty';
+import isString from 'lodash/lang/isString';
+import isUndefined from 'lodash/lang/isUndefined';
 import reqwest from 'reqwest';
 import url from 'url';
-import './modernizr';
 
 let urlBase;
 
@@ -46,7 +49,8 @@ const compile = scss => {
   return new Promise((resolve, reject) => {
     importSass.then(sass => {
       const content = scss.content;
-      if (!content || !content.responseText) {
+      if (isString(content) && isEmpty(content) ||
+          !isUndefined(content.responseText) && isEmpty(content.responseText)) {
         return resolve('');
       }
       sass.compile(content, scss.options, result => {

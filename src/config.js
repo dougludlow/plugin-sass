@@ -19,6 +19,7 @@ System.config({
     "babel-runtime": "npm:babel-runtime@5.8.25",
     "core-js": "npm:core-js@1.2.0",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
+    "lodash": "npm:lodash@3.10.1",
     "querystring": "github:jspm/nodelibs-querystring@0.1.0",
     "reqwest": "github:ded/reqwest@2.0.5",
     "sass.js": "npm:sass.js@0.9.4",
@@ -211,6 +212,9 @@ System.config({
     },
     "npm:inherits@2.0.1": {
       "util": "github:jspm/nodelibs-util@0.1.0"
+    },
+    "npm:lodash@3.10.1": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:miller-rabin@2.0.1": {
       "bn.js": "npm:bn.js@2.2.0",
