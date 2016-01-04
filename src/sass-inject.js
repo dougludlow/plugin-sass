@@ -1,6 +1,9 @@
-import reqwest from 'reqwest';
-import url from 'url';
+/* global Modernizr __moduleName */
 import './modernizr';
+import isEmpty from 'lodash/lang/isEmpty';
+import isString from 'lodash/lang/isString';
+import isUndefined from 'lodash/lang/isUndefined';
+import reqwest from 'reqwest';
 import resolvePath from './resolve-path';
 
 let urlBase;
@@ -48,7 +51,12 @@ importSass.then(sass => {
 const compile = scss => {
   return new Promise((resolve, reject) => {
     importSass.then(sass => {
-      sass.compile(scss.content, scss.options, result => {
+      const content = scss.content;
+      if (isString(content) && isEmpty(content) ||
+          !isUndefined(content.responseText) && isEmpty(content.responseText)) {
+        return resolve('');
+      }
+      sass.compile(content, scss.options, result => {
         if (result.status === 0) {
           const style = document.createElement('style');
           style.textContent = result.text;
@@ -71,7 +79,7 @@ export default load => {
     // In Cordova Apps the response is the raw XMLHttpRequest
     .then(resp => {
       return {
-        content: (resp.responseText ? resp.responseText : resp),
+        content: resp.responseText ? resp.responseText : resp,
         options: { indentedSyntax },
       };
     })

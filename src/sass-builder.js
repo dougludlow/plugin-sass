@@ -1,4 +1,5 @@
 import fs from 'fs';
+import isEmpty from 'lodash/lang/isEmpty';
 import querystring from 'querystring';
 import sass from 'sass.js';
 import url from 'url';
@@ -23,7 +24,7 @@ const escape = source => {
 
 const loadFile = path => {
   return new Promise((resolve, reject) => {
-    fs.readFile(path, {encoding: 'UTF-8'}, (err, data) => {
+    fs.readFile(path, { encoding: 'UTF-8' }, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -35,7 +36,9 @@ const loadFile = path => {
 
 const parseUnescape = uri => {
   // Node doesn't understand Windows' local file urls
-  return (uri.match(/^file:\/\//)) ? uri.replace(/^file:\/\//, '') : querystring.unescape(url.parse(uri).path);
+  // TODO: does not work in Linux / Mac OS X
+  // return (uri.match(/^file:\/\/\//)) ? uri.replace(/^file:\/\/\//, '') : querystring.unescape(url.parse(uri).path);
+  return querystring.unescape(url.parse(uri).path);
 };
 
 // intercept file loading requests (@import directive) from libsass
@@ -72,6 +75,10 @@ export default (loads, compileOpts) => {
         style: sass.style.compressed,
         indentedSyntax: urlBase.endsWith('.sass'),
       };
+      // Occurs on empty files
+      if (isEmpty(load.source)) {
+        return resolve('');
+      }
       sass.compile(load.source, options, result => {
         if (result.status === 0) {
           resolve(result.text);

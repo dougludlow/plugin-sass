@@ -25,17 +25,17 @@
     "browser-sync": "^2.9.3",
     "del": "^2.0.2",
     "eslint": "^1.5.0",
-    "eslint-config-airbnb": "0.0.8",
+    "eslint-config-airbnb": "2.1.1",
     "eslint-plugin-react": "^3.4.2",
-    "fs-extra": "^0.24.0",
+    "fs-extra": "^0.26.3",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.0.0",
     "gulp-jade": "^1.1.0",
-    "gulp-modernizr": "0.0.0",
+    "gulp-modernizr": "1.0.0-alpha",
     "gulp-notify": "^2.2.0",
     "gulp-uglify": "^1.4.2",
-    "jspm": "^0.16.10",
-    "systemjs-builder": "^0.14.6"
+    "jspm": "^0.16.19",
+    "systemjs-builder": "^0.14.15"
   },
   "dependencies": {},
   "jspm": {
@@ -45,6 +45,7 @@
     },
     "dependencies": {
       "fs": "github:jspm/nodelibs-fs@^0.1.2",
+      "lodash": "npm:lodash@^3.10.1",
       "querystring": "github:jspm/nodelibs-querystring@^0.1.0",
       "reqwest": "github:ded/reqwest@^2.0.5",
       "sass.js": "npm:sass.js@^0.9.4",
