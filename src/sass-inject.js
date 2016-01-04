@@ -16,31 +16,52 @@ const importSass = new Promise((resolve, reject) => {
   }
 });
 
+const resolveImportUrl = (request) => {
+  const { previous } = request;
+  let { current } = request;
+  return new Promise((resolve, reject) => {
+    if (previous !== 'stdin' && current.substr(0, 5) !== 'jspm:') {
+      current = url.resolve(previous, current);
+    }
+    if (current.substr(0, 5) === 'jspm:') {
+      const jspmUrl = current.replace(/^jspm:/, '') + '.scss';
+      System.normalize(jspmUrl)
+        .then(normalizedUrl => resolve(normalizedUrl.replace(/\.js$|\.ts$/, '')))
+        .catch(e => reject(e));
+    } else {
+      const resolvedUrl = url.resolve(urlBase, `${current}.scss`);
+      resolve(resolvedUrl);
+    }
+  });
+};
+
+const sassImporter = (request, done) => {
+  let path;
+  let content;
+  // Currently only supporting scss imports due to
+  // https://github.com/sass/libsass/issues/1695
+  resolveImportUrl(request).then(resolvedUrl => {
+    path = resolvedUrl;
+    const partialPath = path.replace(/\/([^/]*)$/, '/_$1');
+    return reqwest(partialPath);
+  })
+    .then(resp => {
+      // In Cordova Apps the response is the raw XMLHttpRequest
+      content = resp.responseText ? resp.responseText : resp;
+      return content;
+    })
+    .catch(() => reqwest(path))
+    .then(resp => {
+      content = resp.responseText ? resp.responseText : resp;
+      return content;
+    })
+    .then(() => done({ content, path }));
+};
 
 // intercept file loading requests (@import directive) from libsass
 importSass.then(sass => {
-  sass.importer((request, done) => {
-    const { current } = request;
-    // Currently only supporting scss imports due to
-    // https://github.com/sass/libsass/issues/1695
-    const importUrl = url.resolve(urlBase, `${current}.scss`);
-    const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-    let content;
-    reqwest(partialUrl)
-      .then(resp => {
-        // In Cordova Apps the response is the raw XMLHttpRequest
-        content = resp.responseText ? resp.responseText : resp;
-        return content;
-      })
-      .catch(() => reqwest(importUrl))
-      .then(resp => {
-        content = resp.responseText ? resp.responseText : resp;
-        return content;
-      })
-      .then(() => done({ content }));
-  });
+  sass.importer(sassImporter);
 });
-
 
 const compile = scss => {
   return new Promise((resolve, reject) => {
