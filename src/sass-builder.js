@@ -2,6 +2,7 @@ import fs from 'fs';
 import isEmpty from 'lodash/lang/isEmpty';
 import querystring from 'querystring';
 import sass from 'sass.js';
+import path from 'path';
 import url from 'url';
 import resolvePath from './resolve-path';
 
@@ -22,9 +23,9 @@ const escape = source => {
     .replace(/[\u2029]/g, '\\u2029');
 };
 
-const loadFile = path => {
+const loadFile = p => {
   return new Promise((resolve, reject) => {
-    fs.readFile(path, { encoding: 'UTF-8' }, (err, data) => {
+    fs.readFile(p, { encoding: 'UTF-8' }, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -46,12 +47,12 @@ sass.importer((request, done) => {
   // Currently only supporting scss imports due to
   // https://github.com/sass/libsass/issues/1695
   let content;
-  let path;
+  let resolved;
   let readImportPath;
   let readPartialPath;
   resolvePath(request, urlBase)
     .then(importUrl => {
-      path = importUrl;
+      resolved = importUrl;
       const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
       readImportPath = parseUnescape(importUrl);
       readPartialPath = parseUnescape(partialUrl);
@@ -60,7 +61,8 @@ sass.importer((request, done) => {
     .then(data => content = data)
     .catch(() => loadFile(readImportPath))
     .then(data => content = data)
-    .then(() => done({ content, path }));
+    .then(() => done({ content, path: resolved }))
+    .catch(() => done());
 });
 
 export default (loads, compileOpts) => {
@@ -70,10 +72,10 @@ export default (loads, compileOpts) => {
 
   const compilePromise = load => {
     return new Promise((resolve, reject) => {
-      urlBase = load.address;
+      urlBase = path.dirname(url.parse(load.address).pathname) + '/';
       const options = {
         style: sass.style.compressed,
-        indentedSyntax: urlBase.endsWith('.sass'),
+        indentedSyntax: load.address.endsWith('.sass'),
       };
       // Occurs on empty files
       if (isEmpty(load.source)) {

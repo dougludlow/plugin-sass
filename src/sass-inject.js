@@ -42,7 +42,8 @@ const sassImporter = (request, done) => {
       content = resp.responseText ? resp.responseText : resp;
       return content;
     })
-    .then(() => done({ content, resolved }));
+    .then(() => done({ content, path: resolved }))
+    .catch(() => done());
 };
 
 // intercept file loading requests (@import directive) from libsass
