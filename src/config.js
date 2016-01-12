@@ -21,6 +21,7 @@ System.config({
     "core-js": "npm:core-js@1.2.0",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
     "lodash": "npm:lodash@3.10.1",
+    "path": "github:jspm/nodelibs-path@0.1.0",
     "querystring": "github:jspm/nodelibs-querystring@0.1.0",
     "reqwest": "github:ded/reqwest@2.0.5",
     "sass.js": "npm:sass.js@0.9.4",

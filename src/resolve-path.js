@@ -1,19 +1,22 @@
-import url from 'url';
+import path from 'path';
+
+const paths = {};
 
 const resolvePath = (request, urlBase) => {
   return new Promise((resolve, reject) => {
-    let { current } = request;
     const { previous } = request;
-    if (previous !== 'stdin' && current.substr(0, 5) !== 'jspm:') {
-      current = url.resolve(previous, current);
-    }
+    let { current } = request;
     if (current.substr(0, 5) === 'jspm:') {
       current = current.replace(/^jspm:/, '') + '.scss';
       System.normalize(current)
-        .then(path => resolve(path.replace(/\.js$|\.ts$/, '')))
+        .then(p => resolve(p.replace(/\.js$|\.ts$/, '')))
         .catch(e => reject(e));
     } else {
-      resolve(url.resolve(urlBase, `${current}.scss`));
+      const prevBase = path.dirname(previous) + '/';
+      const base = (previous === 'stdin') ? urlBase : paths[previous] || prevBase;
+      const resolved = path.resolve(base, current);
+      if (previous !== 'stdin') paths[current] = path.dirname(resolved);
+      resolve(`${resolved}.scss`);
     }
   });
 };

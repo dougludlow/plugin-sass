@@ -4,6 +4,8 @@ import isEmpty from 'lodash/lang/isEmpty';
 import isString from 'lodash/lang/isString';
 import isUndefined from 'lodash/lang/isUndefined';
 import reqwest from 'reqwest';
+import url from 'url';
+import path from 'path';
 import resolvePath from './resolve-path';
 
 let urlBase;
@@ -21,13 +23,13 @@ const importSass = new Promise((resolve, reject) => {
 });
 
 const sassImporter = (request, done) => {
-  let path;
+  let resolved;
   let content;
   // Currently only supporting scss imports due to
   // https://github.com/sass/libsass/issues/1695
   resolvePath(request, urlBase).then(resolvedUrl => {
-    path = resolvedUrl;
-    const partialPath = path.replace(/\/([^/]*)$/, '/_$1');
+    resolved = resolvedUrl;
+    const partialPath = resolved.replace(/\/([^/]*)$/, '/_$1');
     return reqwest(partialPath);
   })
     .then(resp => {
@@ -35,12 +37,12 @@ const sassImporter = (request, done) => {
       content = resp.responseText ? resp.responseText : resp;
       return content;
     })
-    .catch(() => reqwest(path))
+    .catch(() => reqwest(resolved))
     .then(resp => {
       content = resp.responseText ? resp.responseText : resp;
       return content;
     })
-    .then(() => done({ content, path }));
+    .then(() => done({ content, resolved }));
 };
 
 // intercept file loading requests (@import directive) from libsass
@@ -72,10 +74,10 @@ const compile = scss => {
 };
 
 export default load => {
-  urlBase = load.address;
-  const indentedSyntax = urlBase.endsWith('.sass');
+  urlBase = path.dirname(url.parse(load.address).pathname) + '/';
+  const indentedSyntax = load.address.endsWith('.sass');
   // load initial scss file
-  return reqwest(urlBase)
+  return reqwest(load.address)
     // In Cordova Apps the response is the raw XMLHttpRequest
     .then(resp => {
       return {
