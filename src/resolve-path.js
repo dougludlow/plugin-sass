@@ -1,4 +1,5 @@
 import path from 'path';
+import url from 'url';
 
 const paths = {};
 
@@ -14,8 +15,8 @@ const resolvePath = (request, urlBase) => {
     } else {
       const prevBase = path.dirname(previous) + '/';
       const base = (previous === 'stdin') ? urlBase : paths[previous] || prevBase;
-      const resolved = path.resolve(base, current);
-      if (previous !== 'stdin') paths[current] = path.dirname(resolved);
+      const resolved = url.resolve(base, current);
+      if (previous !== 'stdin') paths[current] = path.dirname(resolved) + '/';
       resolve(`${resolved}.scss`);
     }
   });
