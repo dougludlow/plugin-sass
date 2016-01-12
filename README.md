@@ -30,6 +30,14 @@ You can also use the [older syntax](http://sass-lang.com/documentation/file.SASS
 System.import('./style.sass!scss');
 ```
 
+## Importing from jspm
+
+You can import scss files from jspm packages *from within scss files* using the `jspm:` prefix. For example, if you have jspm installed `twbs/bootstrap-sass`:
+
+```scss
+@import 'jspm:bootstrap-sass/assets/stylesheets/bootstrap';
+```
+
 ## Testing the plugin
 
 ```sh

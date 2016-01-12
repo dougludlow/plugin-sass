@@ -4,7 +4,7 @@ import isEmpty from 'lodash/lang/isEmpty';
 import isString from 'lodash/lang/isString';
 import isUndefined from 'lodash/lang/isUndefined';
 import reqwest from 'reqwest';
-import url from 'url';
+import resolvePath from './resolve-path';
 
 let urlBase;
 
@@ -20,31 +20,33 @@ const importSass = new Promise((resolve, reject) => {
   }
 });
 
+const sassImporter = (request, done) => {
+  let path;
+  let content;
+  // Currently only supporting scss imports due to
+  // https://github.com/sass/libsass/issues/1695
+  resolvePath(request, urlBase).then(resolvedUrl => {
+    path = resolvedUrl;
+    const partialPath = path.replace(/\/([^/]*)$/, '/_$1');
+    return reqwest(partialPath);
+  })
+    .then(resp => {
+      // In Cordova Apps the response is the raw XMLHttpRequest
+      content = resp.responseText ? resp.responseText : resp;
+      return content;
+    })
+    .catch(() => reqwest(path))
+    .then(resp => {
+      content = resp.responseText ? resp.responseText : resp;
+      return content;
+    })
+    .then(() => done({ content, path }));
+};
 
 // intercept file loading requests (@import directive) from libsass
 importSass.then(sass => {
-  sass.importer((request, done) => {
-    const { current } = request;
-    // Currently only supporting scss imports due to
-    // https://github.com/sass/libsass/issues/1695
-    const importUrl = url.resolve(urlBase, `${current}.scss`);
-    const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-    let content;
-    reqwest(partialUrl)
-      .then(resp => {
-        // In Cordova Apps the response is the raw XMLHttpRequest
-        content = resp.responseText ? resp.responseText : resp;
-        return content;
-      })
-      .catch(() => reqwest(importUrl))
-      .then(resp => {
-        content = resp.responseText ? resp.responseText : resp;
-        return content;
-      })
-      .then(() => done({ content }));
-  });
+  sass.importer(sassImporter);
 });
-
 
 const compile = scss => {
   return new Promise((resolve, reject) => {
