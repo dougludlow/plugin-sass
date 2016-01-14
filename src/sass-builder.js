@@ -1,12 +1,11 @@
 import fs from 'fs';
 import isEmpty from 'lodash/lang/isEmpty';
-import querystring from 'querystring';
 import sass from 'sass.js';
 import path from 'path';
-import url from 'url';
 import resolvePath from './resolve-path';
 
 const cssInject = "(function(c){var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})";
+const isWin = process.platform.match(/^win/);
 
 let urlBase;
 
@@ -23,8 +22,6 @@ const escape = source => {
     .replace(/[\u2029]/g, '\\u2029');
 };
 
-var isWin = process.platform.match(/^win/);
-
 const loadFile = p => {
   return new Promise((resolve, reject) => {
     fs.readFile(p, { encoding: 'UTF-8' }, (err, data) => {
@@ -37,16 +34,17 @@ const loadFile = p => {
   });
 };
 
-function fromFileURL(address) {
-  address = address.replace(/^file:(\/+)?/i, '');
+const fromFileURL = a => {
+  let address = a.replace(/^file:(\/+)?/i, '');
 
-  if (!isWin)
+  if (!isWin) {
     address = '/' + address;
-  else
+  } else {
     address = address.replace(/\//g, '\\');
+  }
 
   return address;
-}
+};
 
 // intercept file loading requests (@import directive) from libsass
 sass.importer((request, done) => {
