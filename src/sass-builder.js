@@ -23,6 +23,8 @@ const escape = source => {
     .replace(/[\u2029]/g, '\\u2029');
 };
 
+var isWin = process.platform.match(/^win/);
+
 const loadFile = p => {
   return new Promise((resolve, reject) => {
     fs.readFile(p, { encoding: 'UTF-8' }, (err, data) => {
@@ -35,12 +37,16 @@ const loadFile = p => {
   });
 };
 
-const parseUnescape = uri => {
-  // Node doesn't understand Windows' local file urls
-  // TODO: does not work in Linux / Mac OS X
-  // return (uri.match(/^file:\/\/\//)) ? uri.replace(/^file:\/\/\//, '') : querystring.unescape(url.parse(uri).path);
-  return querystring.unescape(url.parse(uri).path);
-};
+function fromFileURL(address) {
+  address = address.replace(/^file:(\/+)?/i, '');
+
+  if (!isWin)
+    address = '/' + address;
+  else
+    address = address.replace(/\//g, '\\');
+
+  return address;
+}
 
 // intercept file loading requests (@import directive) from libsass
 sass.importer((request, done) => {
@@ -54,8 +60,8 @@ sass.importer((request, done) => {
     .then(importUrl => {
       resolved = importUrl;
       const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-      readImportPath = parseUnescape(importUrl);
-      readPartialPath = parseUnescape(partialUrl);
+      readImportPath = fromFileURL(importUrl);
+      readPartialPath = fromFileURL(partialUrl);
       return loadFile(readPartialPath);
     })
     .then(data => content = data)
@@ -72,7 +78,7 @@ export default (loads, compileOpts) => {
 
   const compilePromise = load => {
     return new Promise((resolve, reject) => {
-      urlBase = path.dirname(url.parse(load.address).pathname) + '/';
+      urlBase = path.dirname(load.address) + '/';
       const options = {
         style: sass.style.compressed,
         indentedSyntax: load.address.endsWith('.sass'),
