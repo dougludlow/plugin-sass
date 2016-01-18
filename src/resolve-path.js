@@ -10,7 +10,7 @@ const resolvePath = (request, urlBase) => {
     if (current.substr(0, 5) === 'jspm:') {
       current = current.replace(/^jspm:/, '') + '.scss';
       System.normalize(current)
-        .then(p => resolve(p.replace(/\.js$|\.ts$/, '')))
+        .then(file => resolve(file.replace(/\.js$|\.ts$/, '')))
         .catch(e => reject(e));
     } else {
       const prevBase = path.dirname(previous) + '/';

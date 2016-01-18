@@ -22,9 +22,9 @@ const escape = source => {
     .replace(/[\u2029]/g, '\\u2029');
 };
 
-const loadFile = p => {
+const loadFile = file => {
   return new Promise((resolve, reject) => {
-    fs.readFile(p, { encoding: 'UTF-8' }, (err, data) => {
+    fs.readFile(file, { encoding: 'UTF-8' }, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -34,16 +34,9 @@ const loadFile = p => {
   });
 };
 
-const fromFileURL = a => {
-  let address = a.replace(/^file:(\/+)?/i, '');
-
-  if (!isWin) {
-    address = '/' + address;
-  } else {
-    address = address.replace(/\//g, '\\');
-  }
-
-  return address;
+const fromFileURL = url => {
+  const address = url.replace(/^file:(\/+)?/i, '');
+  return !isWin ? `/${address}` : address.replace(/\//g, '\\');
 };
 
 // intercept file loading requests (@import directive) from libsass
@@ -76,7 +69,7 @@ export default (loads, compileOpts) => {
 
   const compilePromise = load => {
     return new Promise((resolve, reject) => {
-      urlBase = path.dirname(load.address) + '/';
+      urlBase = `${path.dirname(load.address)}/`;
       const options = {
         style: sass.style.compressed,
         indentedSyntax: load.address.endsWith('.sass'),
