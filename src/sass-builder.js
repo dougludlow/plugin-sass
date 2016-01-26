@@ -1,11 +1,11 @@
 import fs from 'fs';
 import isEmpty from 'lodash/lang/isEmpty';
-import querystring from 'querystring';
 import sass from 'sass.js';
-import url from 'url';
+import path from 'path';
 import resolvePath from './resolve-path';
 
 const cssInject = "(function(c){var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})";
+const isWin = process.platform.match(/^win/);
 
 let urlBase;
 
@@ -22,9 +22,9 @@ const escape = source => {
     .replace(/[\u2029]/g, '\\u2029');
 };
 
-const loadFile = path => {
+const loadFile = file => {
   return new Promise((resolve, reject) => {
-    fs.readFile(path, { encoding: 'UTF-8' }, (err, data) => {
+    fs.readFile(file, { encoding: 'UTF-8' }, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -34,11 +34,9 @@ const loadFile = path => {
   });
 };
 
-const parseUnescape = uri => {
-  // Node doesn't understand Windows' local file urls
-  // TODO: does not work in Linux / Mac OS X
-  // return (uri.match(/^file:\/\/\//)) ? uri.replace(/^file:\/\/\//, '') : querystring.unescape(url.parse(uri).path);
-  return querystring.unescape(url.parse(uri).path);
+const fromFileURL = url => {
+  const address = url.replace(/^file:(\/+)?/i, '');
+  return !isWin ? `/${address}` : address.replace(/\//g, '\\');
 };
 
 // intercept file loading requests (@import directive) from libsass
@@ -46,21 +44,22 @@ sass.importer((request, done) => {
   // Currently only supporting scss imports due to
   // https://github.com/sass/libsass/issues/1695
   let content;
-  let path;
+  let resolved;
   let readImportPath;
   let readPartialPath;
   resolvePath(request, urlBase)
     .then(importUrl => {
-      path = importUrl;
+      resolved = importUrl;
       const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-      readImportPath = parseUnescape(importUrl);
-      readPartialPath = parseUnescape(partialUrl);
+      readImportPath = fromFileURL(importUrl);
+      readPartialPath = fromFileURL(partialUrl);
       return loadFile(readPartialPath);
     })
     .then(data => content = data)
     .catch(() => loadFile(readImportPath))
     .then(data => content = data)
-    .then(() => done({ content, path }));
+    .then(() => done({ content, path: resolved }))
+    .catch(() => done());
 });
 
 export default (loads, compileOpts) => {
@@ -70,10 +69,10 @@ export default (loads, compileOpts) => {
 
   const compilePromise = load => {
     return new Promise((resolve, reject) => {
-      urlBase = load.address;
+      urlBase = `${path.dirname(load.address)}/`;
       const options = {
         style: sass.style.compressed,
-        indentedSyntax: urlBase.endsWith('.sass'),
+        indentedSyntax: load.address.endsWith('.sass'),
       };
       // Occurs on empty files
       if (isEmpty(load.source)) {

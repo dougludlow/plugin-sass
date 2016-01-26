@@ -8,6 +8,8 @@ import jade from 'gulp-jade';
 import notify from 'gulp-notify';
 import modernizr from 'gulp-modernizr';
 import uglify from 'gulp-uglify';
+import tape from 'gulp-tape';
+import tapColorize from 'tap-colorize';
 
 const browserSync = browserSyncModule.create();
 const bundle = (buildStatic = false) => {
@@ -55,6 +57,7 @@ gulp.task('lint', () => {
     '!src/modernizr.js',
     '!src/jspm_packages/**',
     'src/**/*.js',
+    'test/**/*.spec.js',
   ];
   return gulp.src(glob)
     .pipe(eslint())
@@ -73,6 +76,13 @@ gulp.task('modernizr', () => {
     .pipe(modernizr())
     .pipe(uglify())
     .pipe(gulp.dest('src'));
+});
+
+gulp.task('test', () => {
+    return gulp.src('test/*.spec.js')
+    .pipe(tape({
+      reporter: tapColorize()
+    }));
 });
 
 gulp.task('test:runtime', ['jade', 'modernizr'], () => {
@@ -105,7 +115,7 @@ gulp.task('test:bundleStatic', ['jade', 'bundleStatic'], () => {
   gulp.watch('src/**.js').on('change', browserSync.reload);
 });
 
-gulp.task('default', ['lint', 'modernizr'], () => {
+gulp.task('default', ['lint', 'test', 'modernizr'], () => {
   return gulp.src('.')
     .pipe(notify({
       message: 'Successfully build',
