@@ -3,7 +3,7 @@ import url from 'url';
 
 const paths = {};
 
-const resolvePath = (request, urlBase) => {
+const resolvePath = (request) => {
   return new Promise((resolve, reject) => {
     const { previous } = request;
     let { current } = request;
@@ -14,7 +14,7 @@ const resolvePath = (request, urlBase) => {
         .catch(e => reject(e));
     } else {
       const prevBase = path.dirname(previous) + '/';
-      const base = (previous === 'stdin') ? urlBase : paths[previous] || prevBase;
+      const base = (previous === 'stdin') ? request.options.urlBase : paths[previous] || prevBase;
       const resolved = url.resolve(base, current);
       if (previous !== 'stdin') paths[current] = path.dirname(resolved) + '/';
       resolve(`${resolved}.scss`);
