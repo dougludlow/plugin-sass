@@ -7,8 +7,6 @@ import resolvePath from './resolve-path';
 const cssInject = "(function(c){var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})";
 const isWin = process.platform.match(/^win/);
 
-let urlBase;
-
 const escape = source => {
   return source
     .replace(/(["\\])/g, '\\$1')
@@ -47,7 +45,7 @@ sass.importer((request, done) => {
   let resolved;
   let readImportPath;
   let readPartialPath;
-  resolvePath(request, urlBase)
+  resolvePath(request)
     .then(importUrl => {
       resolved = importUrl;
       const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
@@ -69,10 +67,11 @@ export default (loads, compileOpts) => {
 
   const compilePromise = load => {
     return new Promise((resolve, reject) => {
-      urlBase = `${path.dirname(load.address)}/`;
+      const urlBase = `${path.dirname(load.address)}/`;
       const options = {
         style: sass.style.compressed,
         indentedSyntax: load.address.endsWith('.sass'),
+        importer: { urlBase },
       };
       // Occurs on empty files
       if (isEmpty(load.source)) {

@@ -8,12 +8,12 @@ import url from 'url';
 import path from 'path';
 import resolvePath from './resolve-path';
 
-let urlBase;
-
 const importSass = new Promise((resolve, reject) => {
   if (Modernizr.webworkers) {
     System.import('sass.js/dist/sass', __moduleName).then(Sass => {
-      resolve(new Sass());
+      System.normalize('sass.js/dist/sass.worker', __moduleName).then(worker => {
+        resolve(new Sass(worker));
+      });
     }).catch(err => reject(err));
   } else {
     System.import('sass.js/dist/sass.sync', __moduleName).then(Sass => {
@@ -27,7 +27,7 @@ const sassImporter = (request, done) => {
   let content;
   // Currently only supporting scss imports due to
   // https://github.com/sass/libsass/issues/1695
-  resolvePath(request, urlBase).then(resolvedUrl => {
+  resolvePath(request).then(resolvedUrl => {
     resolved = resolvedUrl;
     const partialPath = resolved.replace(/\/([^/]*)$/, '/_$1');
     return reqwest(partialPath);
@@ -75,7 +75,7 @@ const compile = scss => {
 };
 
 export default load => {
-  urlBase = path.dirname(url.parse(load.address).pathname) + '/';
+  const urlBase = path.dirname(url.parse(load.address).pathname) + '/';
   const indentedSyntax = load.address.endsWith('.sass');
   // load initial scss file
   return reqwest(load.address)
@@ -83,7 +83,10 @@ export default load => {
     .then(resp => {
       return {
         content: resp.responseText ? resp.responseText : resp,
-        options: { indentedSyntax },
+        options: {
+          indentedSyntax,
+          importer: { urlBase },
+        },
       };
     })
     .then(compile);
