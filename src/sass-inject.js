@@ -72,6 +72,7 @@ const compile = scss => {
             style.setAttribute('type', 'text/css');
             style.textContent = css;
             document.getElementsByTagName('head')[0].appendChild(style);
+            // return an empty module in the module pipeline itself
             resolve('');
           });
         } else {
