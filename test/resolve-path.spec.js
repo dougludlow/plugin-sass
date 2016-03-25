@@ -29,8 +29,8 @@ test('jspm import', assert => {
   resolvePath(request, '/')
     .then(p => {
       // System.normalize in resolvePath will give us the absolute path
-      const relative = '/' + path.relative(__dirname, url.parse(p).path);
-      assert.equal(relative, '/jspm_packages/npm/mock-package@1.0.0/mock-asset.scss', 'resolves "jspm:" import');
+      const relative = `/${path.relative(__dirname, url.parse(p).path)}`;
+      assert.equal(relative, `/${path.join('jspm_packages', 'npm', 'mock-package@1.0.0', 'mock-asset.scss')}`);
     })
     .catch(e => assert.fail(e))
     .then(() => assert.end());
