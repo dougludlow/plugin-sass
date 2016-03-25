@@ -9,12 +9,12 @@ test('sanity check', assert => {
 });
 
 test('import', assert => {
-  let request = {
+  const request = {
     current: 'mock/import',
     previous: 'stdin',
     options: {
-      urlBase: '/'
-    }
+      urlBase: '/',
+    },
   };
 
   resolvePath(request, '/')
