@@ -8,6 +8,23 @@ test('sanity check', assert => {
   assert.end();
 });
 
+test('import', assert => {
+  const request = {
+    current: 'mock/import',
+    previous: 'stdin',
+    options: {
+      urlBase: '/',
+    },
+  };
+
+  resolvePath(request, '/')
+    .then(p => {
+      assert.equal(p, '/mock/import.scss', 'resolves import.');
+    })
+    .catch(e => assert.fail(e))
+    .then(() => assert.end());
+});
+
 test('jspm import', assert => {
   System.config({
     baseURL: __dirname,
