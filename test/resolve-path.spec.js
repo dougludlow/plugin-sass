@@ -1,6 +1,7 @@
-import test from 'tape';
 import path from 'path';
+import test from 'tape';
 import url from 'url';
+
 import resolvePath from '../src/resolve-path';
 
 test('sanity check', assert => {

@@ -56,7 +56,7 @@ To enable [autoprefixer](https://github.com/postcss/autoprefixer)
 
 ```js
 sassPluginOptions: {
-  autoprefixer: true
+  "autoprefixer": true
 }
 ```
 

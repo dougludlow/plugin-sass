@@ -8,13 +8,13 @@ System.config({
       "optimisation.modules.system"
     ]
   },
-  sassPluginOptions: {
-    autoprefixer: true
-  },
   paths: {
     "test/*": "./test/*",
     "github:*": "jspm_packages/github/*",
     "npm:*": "jspm_packages/npm/*"
+  },
+  sassPluginOptions: {
+    "autoprefixer": true
   },
 
   map: {
@@ -24,7 +24,7 @@ System.config({
     "bootstrap": "github:twbs/bootstrap-sass@3.3.6",
     "core-js": "npm:core-js@1.2.0",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
-    "lodash": "npm:lodash@3.10.1",
+    "lodash": "npm:lodash@4.6.1",
     "path": "github:jspm/nodelibs-path@0.1.0",
     "postcss": "npm:postcss@5.0.18",
     "reqwest": "github:ded/reqwest@2.0.5",
@@ -254,7 +254,8 @@ System.config({
     "npm:js-base64@2.1.9": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
-    "npm:lodash@3.10.1": {
+    "npm:lodash@4.6.1": {
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:miller-rabin@4.0.0": {
