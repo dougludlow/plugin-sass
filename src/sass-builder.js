@@ -1,4 +1,5 @@
 import autoprefixer from 'autoprefixer';
+import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
 import isEmpty from 'lodash/isEmpty';
 import isUndefined from 'lodash/isUndefined';
@@ -72,11 +73,14 @@ export default (loads, compileOpts) => {
   const compilePromise = load => {
     return new Promise((resolve, reject) => {
       const urlBase = `${path.dirname(load.address)}/`;
-      const options = {
-        style: sass.style.compressed,
-        indentedSyntax: load.address.endsWith('.sass'),
-        importer: { urlBase },
-      };
+      let options = {};
+      if (!isUndefined(System.sassPluginOptions) &&
+          !isUndefined(System.sassPluginOptions.sassOptions)) {
+        options = cloneDeep(System.sassPluginOptions.sassOptions);
+      }
+      options.style = sass.style.compressed;
+      options.indentedSyntax = load.address.endsWith('.sass');
+      options.importer = { urlBase };
       // Occurs on empty files
       if (isEmpty(load.source)) {
         return resolve('');

@@ -98,16 +98,20 @@ export default load => {
   }
   const urlBase = basePath;
   const indentedSyntax = load.address.endsWith('.sass');
+  let options = {};
+  if (!isUndefined(System.sassPluginOptions) &&
+      !isUndefined(System.sassPluginOptions.sassOptions)) {
+    options = System.sassPluginOptions.sassOptions;
+  }
+  options.indentedSyntax = indentedSyntax;
+  options.importer = { urlBase };
   // load initial scss file
   return reqwest(load.address)
     // In Cordova Apps the response is the raw XMLHttpRequest
     .then(resp => {
       return {
         content: resp.responseText ? resp.responseText : resp,
-        options: {
-          indentedSyntax,
-          importer: { urlBase },
-        },
+        options,
       };
     })
     .then(compile);

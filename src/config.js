@@ -14,7 +14,10 @@ System.config({
     "npm:*": "jspm_packages/npm/*"
   },
   sassPluginOptions: {
-    "autoprefixer": true
+    "autoprefixer": true,
+    "sassOptions": {
+      
+    }
   },
 
   map: {

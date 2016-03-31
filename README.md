@@ -60,6 +60,18 @@ sassPluginOptions: {
 }
 ```
 
+### SASS options
+
+To add SASS [options](https://github.com/medialize/sass.js/#using-the-sassjs-api)
+
+```js
+sassPluginOptions: {
+  "sassOptions": {
+
+  }
+}
+```
+
 ## Testing the plugin
 
 ```sh
