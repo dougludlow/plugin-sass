@@ -65,16 +65,24 @@ const compile = scss => {
       return resolve('');
     }
     importSass.then(sass => {
+      function inject(css) {
+        const style = document.createElement('style');
+        style.setAttribute('type', 'text/css');
+        style.textContent = css;
+        document.getElementsByTagName('head')[0].appendChild(style);
+        // return an empty module in the module pipeline itself
+        resolve('');
+      }
       sass.compile(content, scss.options, ({ status, text, formatted }) => {
         if (status === 0) {
-          postcss([autoprefixer]).process(text).then(({ css }) => {
-            const style = document.createElement('style');
-            style.setAttribute('type', 'text/css');
-            style.textContent = css;
-            document.getElementsByTagName('head')[0].appendChild(style);
-            // return an empty module in the module pipeline itself
-            resolve('');
-          });
+          if (!isUndefined(System.sassPluginOptions) &&
+              System.sassPluginOptions.autoprefixer) {
+            postcss([autoprefixer]).process(text).then(({ css }) => {
+              inject(css);
+            });
+          } else {
+            inject(text);
+          }
         } else {
           reject(formatted);
         }
@@ -88,7 +96,6 @@ export default load => {
   if (basePath !== '/') {
     basePath += '/';
   }
-
   const urlBase = basePath;
   const indentedSyntax = load.address.endsWith('.sass');
   // load initial scss file

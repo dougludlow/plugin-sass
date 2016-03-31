@@ -1,6 +1,7 @@
 import autoprefixer from 'autoprefixer';
 import fs from 'fs';
 import isEmpty from 'lodash/lang/isEmpty';
+import isUndefined from 'lodash/lang/isUndefined';
 import path from 'path';
 import postcss from 'postcss';
 import sass from 'sass.js';
@@ -82,9 +83,14 @@ export default (loads, compileOpts) => {
       }
       sass.compile(load.source, options, ({ status, text, formatted }) => {
         if (status === 0) {
-          postcss([autoprefixer]).process(text).then(({ css }) => {
-            resolve(css);
-          });
+          if (!isUndefined(System.sassPluginOptions) &&
+              System.sassPluginOptions.autoprefixer) {
+            postcss([autoprefixer]).process(text).then(({ css }) => {
+              resolve(css);
+            });
+          } else {
+            resolve(text);
+          }
         } else {
           reject(formatted);
         }

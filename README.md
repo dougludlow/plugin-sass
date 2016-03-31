@@ -38,6 +38,28 @@ You can import scss files from jspm packages *from within scss files* using the 
 @import 'jspm:bootstrap-sass/assets/stylesheets/bootstrap';
 ```
 
+## Configuring the plugin
+
+You can configure some options how the plugin should behave. Just add a new
+`sassPluginOptions` config object to your `config.js`.
+
+```js
+System.config({
+  sassPluginOptions: {
+  }
+})
+```
+
+### Autoprefixer
+
+To enable [autoprefixer](https://github.com/postcss/autoprefixer)
+
+```js
+sassPluginOptions: {
+  autoprefixer: true
+}
+```
+
 ## Testing the plugin
 
 ```sh

@@ -8,6 +8,9 @@ System.config({
       "optimisation.modules.system"
     ]
   },
+  sassPluginOptions: {
+    autoprefixer: true
+  },
   paths: {
     "test/*": "./test/*",
     "github:*": "jspm_packages/github/*",
