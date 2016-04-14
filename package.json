@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/screendriver/plugin-sass.git"
+    "url": "git+https://github.com/mobilexag/plugin-sass.git"
   },
-  "author": "Christian Rackerseder <github@echooff.de>",
+  "author": "Christian Rackerseder <git@echooff.de>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/screendriver/plugin-sass/issues"
+    "url": "https://github.com/mobilexag/plugin-sass/issues"
   },
-  "homepage": "https://github.com/screendriver/plugin-sass#readme",
+  "homepage": "https://github.com/mobilexag/plugin-sass#readme",
   "devDependencies": {
     "babel": "^5.8.23",
     "babel-core": "^5.8.25",
