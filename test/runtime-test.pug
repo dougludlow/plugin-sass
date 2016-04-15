@@ -8,10 +8,16 @@ html
     script(src='config.js')
     script(type='text/javascript').
       System.import('styles/test.scss!')
-        .then(() => System.import('styles/test_sass.sass!scss'))
-        .then(() => System.import('styles/test_other.scss!'))
-        .then(() => System.import('styles/spaced dir/spaced.scss!'))
-        .then(() => {
+        .then(function() {
+          return System.import('styles/test_sass.sass!scss');
+        })
+        .then(function() {
+          return System.import('styles/test_other.scss!');
+        })
+        .then(function() {
+          return System.import('styles/spaced dir/spaced.scss!');
+        })
+        .then(function() {
           document.body.innerHTML += '<h2>Loading done</h2>';
         });
   body
