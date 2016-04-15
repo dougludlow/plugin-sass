@@ -56,13 +56,14 @@ importSass.then(sass => {
   sass.importer(sassImporter);
 });
 
-const compile = scss => {
+function compile(scss) {
   return new Promise((resolve, reject) => {
     const content = scss.content;
     const responseText = content.responseText;
     if (isString(content) && isEmpty(content) ||
         !isUndefined(responseText) && isEmpty(responseText)) {
-      return resolve('');
+      resolve('');
+      return;
     }
     importSass.then(sass => {
       function inject(css) {
@@ -89,7 +90,7 @@ const compile = scss => {
       });
     });
   });
-};
+}
 
 export default load => {
   let basePath = path.dirname(url.parse(load.address).pathname);
@@ -108,11 +109,9 @@ export default load => {
   // load initial scss file
   return reqwest(load.address)
     // In Cordova Apps the response is the raw XMLHttpRequest
-    .then(resp => {
-      return {
-        content: resp.responseText ? resp.responseText : resp,
-        options,
-      };
-    })
+    .then(resp => ({
+      content: resp.responseText ? resp.responseText : resp,
+      options,
+    }))
     .then(compile);
 };

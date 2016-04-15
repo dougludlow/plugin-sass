@@ -4,13 +4,14 @@ let translate;
 let bundle;
 
 if (typeof window !== 'undefined') {
-  fetch = load => {
+  fetch = function fetchIt(load) {
     return System.import('./sass-inject', { name: __moduleName })
       .then(inject => inject.default(load));
   };
 } else {
   // setting format = 'defined' means we're managing our own output
-  translate = load => {
+  translate = function translateIt(load) {
+    /* eslint no-param-reassign: "off" */
     load.metadata.format = 'defined';
   };
   bundle = function bundler(loads, opts) {
