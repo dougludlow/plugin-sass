@@ -70,7 +70,7 @@ sass.importer(async (request, done) => {
 });
 
 export default async function sassBuilder(loads, compileOpts) {
-  async function compilePromise(load) {
+  async function compile(load) {
     const urlBase = `${path.dirname(load.address)}/`;
     let options = {};
     if (!isUndefined(System.sassPluginOptions) &&
@@ -101,10 +101,13 @@ export default async function sassBuilder(loads, compileOpts) {
     `${(compileOpts.systemGlobal || 'System')}\.register('${name}', [], false, function() {});`
   ).join('\n');
   // Keep style order
-  const response = await Promise.all(loads.map(compilePromise));
+  const styles = [];
+  for (const load of loads) {
+    styles.push(await compile(load));
+  }
   return [
     stubDefines,
     cssInject,
-    `("${escape(response.reverse().join(''))}");`,
+    `("${escape(styles.reverse().join(''))}");`,
   ].join('\n');
 }
