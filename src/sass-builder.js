@@ -1,4 +1,5 @@
 /* eslint max-len: "off" */
+
 import autoprefixer from 'autoprefixer';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
@@ -44,74 +45,66 @@ function fromFileURL(url) {
 }
 
 // intercept file loading requests (@import directive) from libsass
-sass.importer((request, done) => {
+sass.importer(async (request, done) => {
   // Currently only supporting scss imports due to
   // https://github.com/sass/libsass/issues/1695
   let content;
   let resolved;
   let readImportPath;
   let readPartialPath;
-  resolvePath(request)
-    .then(importUrl => {
-      resolved = importUrl;
-      const partialUrl = importUrl.replace(/\/([^/]*)$/, '/_$1');
-      readImportPath = fromFileURL(importUrl);
-      readPartialPath = fromFileURL(partialUrl);
-      return loadFile(readPartialPath);
-    })
-    .then(data => {
-      content = data;
-      return data;
-    })
-    .catch(() => loadFile(readImportPath))
-    .then(data => {
-      content = data;
-    })
-    .then(() => done({ content, path: resolved }))
-    .catch(() => done());
+  try {
+    resolved = await resolvePath(request);
+    const partialUrl = resolved.replace(/\/([^/]*)$/, '/_$1');
+    readImportPath = fromFileURL(resolved);
+    readPartialPath = fromFileURL(partialUrl);
+    content = await loadFile(readPartialPath);
+  } catch (e) {
+    try {
+      content = await loadFile(readImportPath);
+    } catch (er) {
+      done();
+      return;
+    }
+  }
+  done({ content, path: resolved });
 });
 
-export default function sassBuilder(loads, compileOpts) {
-  function compilePromise(load) {
-    return new Promise((resolve, reject) => {
-      const urlBase = `${path.dirname(load.address)}/`;
-      let options = {};
-      if (!isUndefined(System.sassPluginOptions) &&
-          !isUndefined(System.sassPluginOptions.sassOptions)) {
-        options = cloneDeep(System.sassPluginOptions.sassOptions);
-      }
-      options.style = sass.style.compressed;
-      options.indentedSyntax = load.address.endsWith('.sass');
-      options.importer = { urlBase };
-      // Occurs on empty files
-      if (isEmpty(load.source)) {
-        resolve('');
-        return;
-      }
-      sass.compile(load.source, options, ({ status, text, formatted }) => {
-        if (status === 0) {
-          if (!isUndefined(System.sassPluginOptions) &&
-              System.sassPluginOptions.autoprefixer) {
-            postcss([autoprefixer]).process(text).then(({ css }) => {
-              resolve(css);
-            });
-          } else {
-            resolve(text);
-          }
-        } else {
-          reject(formatted);
-        }
-      });
+export default async function sassBuilder(loads, compileOpts) {
+  async function compilePromise(load) {
+    const urlBase = `${path.dirname(load.address)}/`;
+    let options = {};
+    if (!isUndefined(System.sassPluginOptions) &&
+        !isUndefined(System.sassPluginOptions.sassOptions)) {
+      options = cloneDeep(System.sassPluginOptions.sassOptions);
+    }
+    options.style = sass.style.compressed;
+    options.indentedSyntax = load.address.endsWith('.sass');
+    options.importer = { urlBase };
+    // Occurs on empty files
+    if (isEmpty(load.source)) {
+      return '';
+    }
+    const { status, text, formatted } = await new Promise(resolve => {
+      sass.compile(load.source, options, resolve);
     });
+    if (status !== 0) {
+      throw formatted;
+    }
+    if (!isUndefined(System.sassPluginOptions) &&
+        System.sassPluginOptions.autoprefixer) {
+      const { css } = await postcss([autoprefixer]).process(text);
+      return css;
+    }
+    return text;
   }
-  const stubDefines = loads.map(load =>
-    `${(compileOpts.systemGlobal || 'System')}\.register('${load.name}', [], false, function() {});`
+  const stubDefines = loads.map(({ name }) =>
+    `${(compileOpts.systemGlobal || 'System')}\.register('${name}', [], false, function() {});`
   ).join('\n');
-  return new Promise((resolve, reject) => {
-    // Keep style order
-    Promise.all(loads.map(compilePromise))
-    .then(
-      response => resolve([stubDefines, cssInject, `("${escape(response.reverse().join(''))}");`].join('\n')),
-      reason => reject(reason));
-  });
+  // Keep style order
+  const response = await Promise.all(loads.map(compilePromise));
+  return [
+    stubDefines,
+    cssInject,
+    `("${escape(response.reverse().join(''))}");`,
+  ].join('\n');
 }

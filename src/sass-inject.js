@@ -13,86 +13,77 @@ import url from 'url';
 
 import resolvePath from './resolve-path';
 
-const importSass = new Promise((resolve, reject) => {
+const importSass = new Promise(async resolve => {
   if (Modernizr.webworkers) {
-    System.import('sass.js/dist/sass', __moduleName).then(Sass => {
-      System.normalize('sass.js/dist/sass.worker', __moduleName).then(worker => {
-        resolve(new Sass(worker));
-      });
-    }).catch(err => reject(err));
+    const Sass = await System.import('sass.js/dist/sass', __moduleName);
+    const worker = await System.normalize('sass.js/dist/sass.worker', __moduleName);
+    resolve(new Sass(worker));
   } else {
-    System.import('sass.js/dist/sass.sync', __moduleName).then(Sass => {
-      resolve(Sass);
-    }).catch(err => reject(err));
+    const Sass = await System.import('sass.js/dist/sass.sync', __moduleName);
+    resolve(Sass);
   }
 });
 
-const sassImporter = (request, done) => {
+async function sassImporter(request, done) {
   let resolved;
   let content;
-  // Currently only supporting scss imports due to
-  // https://github.com/sass/libsass/issues/1695
-  resolvePath(request).then(resolvedUrl => {
-    resolved = resolvedUrl;
+  try {
+    // Currently only supporting scss imports due to
+    // https://github.com/sass/libsass/issues/1695
+    resolved = await resolvePath(request);
     const partialPath = resolved.replace(/\/([^/]*)$/, '/_$1');
-    return reqwest(partialPath);
-  })
-    .then(resp => {
-      // In Cordova Apps the response is the raw XMLHttpRequest
+    const resp = await reqwest(partialPath);
+    // In Cordova Apps the response is the raw XMLHttpRequest
+    content = resp.responseText ? resp.responseText : resp;
+  } catch (e) {
+    try {
+      const resp = await reqwest(resolved);
       content = resp.responseText ? resp.responseText : resp;
-      return content;
-    })
-    .catch(() => reqwest(resolved))
-    .then(resp => {
-      content = resp.responseText ? resp.responseText : resp;
-      return content;
-    })
-    .then(() => done({ content, path: resolved }))
-    .catch(() => done());
-};
+    } catch (er) {
+      done();
+      return;
+    }
+  }
+  done({ content, path: resolved });
+}
 
 // intercept file loading requests (@import directive) from libsass
 importSass.then(sass => {
   sass.importer(sassImporter);
 });
 
-function compile(scss) {
-  return new Promise((resolve, reject) => {
-    const content = scss.content;
-    const responseText = content.responseText;
-    if (isString(content) && isEmpty(content) ||
-        !isUndefined(responseText) && isEmpty(responseText)) {
-      resolve('');
-      return;
-    }
-    importSass.then(sass => {
-      function inject(css) {
-        const style = document.createElement('style');
-        style.setAttribute('type', 'text/css');
-        style.textContent = css;
-        document.getElementsByTagName('head')[0].appendChild(style);
-        // return an empty module in the module pipeline itself
-        resolve('');
-      }
-      sass.compile(content, scss.options, ({ status, text, formatted }) => {
-        if (status === 0) {
-          if (!isUndefined(System.sassPluginOptions) &&
-              System.sassPluginOptions.autoprefixer) {
-            postcss([autoprefixer]).process(text).then(({ css }) => {
-              inject(css);
-            });
-          } else {
-            inject(text);
-          }
-        } else {
-          reject(formatted);
-        }
-      });
-    });
+async function compile(scss) {
+  const content = scss.content;
+  const responseText = content.responseText;
+  if (isString(content) && isEmpty(content) ||
+      !isUndefined(responseText) && isEmpty(responseText)) {
+    return '';
+  }
+  const sass = await importSass;
+  function inject(css) {
+    const style = document.createElement('style');
+    style.setAttribute('type', 'text/css');
+    style.textContent = css;
+    document.getElementsByTagName('head')[0].appendChild(style);
+  }
+  const { status, text, formatted } = await new Promise(res => {
+    sass.compile(content, scss.options, res);
   });
+  if (status !== 0) {
+    throw formatted;
+  }
+  if (!isUndefined(System.sassPluginOptions) &&
+      System.sassPluginOptions.autoprefixer) {
+    const { css } = await postcss([autoprefixer]).process(text);
+    inject(css);
+  } else {
+    inject(text);
+  }
+  // return an empty module in the module pipeline itself
+  return '';
 }
 
-export default load => {
+export default async function sassInject(load) {
   let basePath = path.dirname(url.parse(load.address).pathname);
   if (basePath !== '/') {
     basePath += '/';
@@ -107,11 +98,11 @@ export default load => {
   options.indentedSyntax = indentedSyntax;
   options.importer = { urlBase };
   // load initial scss file
-  return reqwest(load.address)
-    // In Cordova Apps the response is the raw XMLHttpRequest
-    .then(resp => ({
-      content: resp.responseText ? resp.responseText : resp,
-      options,
-    }))
-    .then(compile);
-};
+  const resp = await reqwest(load.address);
+  // In Cordova Apps the response is the raw XMLHttpRequest
+  const scss = {
+    content: resp.responseText ? resp.responseText : resp,
+    options,
+  };
+  return compile(scss);
+}
