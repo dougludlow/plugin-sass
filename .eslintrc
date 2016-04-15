@@ -1,6 +1,7 @@
 {
+  "parser": "babel-eslint",
   "extends": "airbnb/base",
   "rules": {
-    "arrow-body-style": ["error", "as-needed"]
+    "strict": 0
   }
 }
