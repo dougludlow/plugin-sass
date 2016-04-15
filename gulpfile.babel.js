@@ -1,15 +1,15 @@
 import browserSyncModule from 'browser-sync';
-import Builder from 'systemjs-builder';
 import del from 'del';
 import eslint from 'gulp-eslint';
 import fse from 'fs-extra';
 import gulp from 'gulp';
-import jade from 'gulp-jade';
-import notify from 'gulp-notify';
 import modernizr from 'gulp-modernizr';
-import uglify from 'gulp-uglify';
-import tape from 'gulp-tape';
+import notify from 'gulp-notify';
+import pug from 'gulp-pug';
 import tapColorize from 'tap-colorize';
+import tape from 'gulp-tape';
+import uglify from 'gulp-uglify';
+import Builder from 'systemjs-builder';
 
 const browserSync = browserSyncModule.create();
 const bundle = (buildStatic = false) => {
@@ -33,23 +33,17 @@ const bundle = (buildStatic = false) => {
   return Promise.all([build, copyFiles]);
 };
 
-gulp.task('clean', () => {
-  return del('.tmp');
-});
+gulp.task('clean', () => del('.tmp'));
 
-gulp.task('jade', ['clean'], () => {
-  return gulp.src('test/*.jade')
-    .pipe(jade())
-    .pipe(gulp.dest('.tmp'));
-});
+gulp.task('pug', ['clean'], () =>
+  gulp.src('test/*.pug')
+    .pipe(pug())
+    .pipe(gulp.dest('.tmp'))
+);
 
-gulp.task('bundle', ['clean'], () => {
-  return bundle();
-});
+gulp.task('bundle', ['clean'], () => bundle());
 
-gulp.task('bundleStatic', ['clean'], () => {
-  return bundle(true);
-});
+gulp.task('bundleStatic', ['clean'], () => bundle(true));
 
 gulp.task('lint', () => {
   const glob = [
@@ -78,14 +72,14 @@ gulp.task('modernizr', () => {
     .pipe(gulp.dest('src'));
 });
 
-gulp.task('test', () => {
-  return gulp.src('test/*.spec.js')
+gulp.task('test', () =>
+  gulp.src('test/*.spec.js')
     .pipe(tape({
       reporter: tapColorize(),
-    }));
-});
+    }))
+);
 
-gulp.task('test:runtime', ['jade', 'modernizr'], () => {
+gulp.task('test:runtime', ['pug', 'modernizr'], () => {
   browserSync.init({
     server: {
       index: 'runtime-test.html',
@@ -95,7 +89,7 @@ gulp.task('test:runtime', ['jade', 'modernizr'], () => {
   gulp.watch('src/**.js').on('change', browserSync.reload);
 });
 
-gulp.task('test:bundle', ['jade', 'bundle'], () => {
+gulp.task('test:bundle', ['pug', 'bundle'], () => {
   browserSync.init({
     server: {
       baseDir: ['.tmp', 'test'],
@@ -105,7 +99,7 @@ gulp.task('test:bundle', ['jade', 'bundle'], () => {
   gulp.watch('src/**.js').on('change', browserSync.reload);
 });
 
-gulp.task('test:bundleStatic', ['jade', 'bundleStatic'], () => {
+gulp.task('test:bundleStatic', ['pug', 'bundleStatic'], () => {
   browserSync.init({
     server: {
       baseDir: ['.tmp', 'test'],
@@ -115,10 +109,10 @@ gulp.task('test:bundleStatic', ['jade', 'bundleStatic'], () => {
   gulp.watch('src/**.js').on('change', browserSync.reload);
 });
 
-gulp.task('default', ['lint', 'test', 'modernizr'], () => {
-  return gulp.src('.')
+gulp.task('default', ['lint', 'test', 'modernizr'], () =>
+  gulp.src('.')
     .pipe(notify({
       message: 'Successfully build',
       onLast: true,
-    }));
-});
+    }))
+);
