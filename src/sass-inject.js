@@ -52,7 +52,7 @@ importSass.then(sass => {
   sass.importer(sassImporter);
 });
 
-async function compile(scss) {
+async function compile(scss, styleUrl) {
   const content = scss.content;
   const responseText = content.responseText;
   if (isString(content) && isEmpty(content) ||
@@ -60,9 +60,19 @@ async function compile(scss) {
     return '';
   }
   const sass = await importSass;
+
+  function tryCleanup() {
+    const element = document.querySelector(`style[data-url="${styleUrl}"]`);
+    if (element) {
+      element.parentElement.removeChild(element);
+    }
+  }
+
   function inject(css) {
+    tryCleanup();
     const style = document.createElement('style');
     style.setAttribute('type', 'text/css');
+    style.setAttribute('data-url', styleUrl);
     style.textContent = css;
     document.getElementsByTagName('head')[0].appendChild(style);
   }
@@ -104,5 +114,5 @@ export default async function sassInject(load) {
     content: resp.responseText ? resp.responseText : resp,
     options,
   };
-  return compile(scss);
+  return compile(scss, load.address);
 }
