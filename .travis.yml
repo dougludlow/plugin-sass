@@ -1,7 +1,11 @@
 language: node_js
 node_js:
   - '5.10'
+env:
+  global:
+  - secure: K3NaeZy1jnEW1J3tlLcEAJguECu4W4oKMZpOHQPXTDecSbvdogPVi4+4/BWERnQbIUnkqRes5xWPJCeqGI4MrXcLyNaxNoruvjBLcEWCi7tGIjLF+heRUz+DX2Tmorkw5sJuImDKPqpYLy3bYnd8KhSWhCSMBYpWbnBEqabuMynd9kyslDte0dSyrq0buxfSl5B6Mh526smWg6uXHEgqm7GTpk+y0TPNJzwRXNBm0di7T0hj/bbbIRFq0e+5nHCSy1UOqK+9NG96koAFmuSHT0RIj9VrYLOErwZV3QLXNAfV4Ez4ADvi6sZRsT/Ie7OcU+9yPvfzHzm8FiOxhNs0lUcGn8fvOeBj+YG8m/7kiqMIkzkfAw/yf6jT4+/HQQWjx5PWVphlp/WGh2T9ApEi3QYsFVY0muw+PuuRLbsnuUDEggqw3x/xZBQ/1oLbcZaQkTCVs3TV+AM5yAH72h6FJHZufvEF+dTWLPfy4Nb6Qfiwmml/QI0hjPfu7FkDEGw4PLHkybIMvE89jKwn0hmDmrCHquj1+NrLBRjoJQD61tokn9xi0c2gvcnCWqScd0juWYiZxilVOUi1qw8BtbiMsPoV6X5qJYZbedmRVG0lkz3+TsDjV0OMiX2TWD/w4d4iNxgeiskSeLNKsmPrsbZIsFDSGaXcwFJ/megkGq0H5I8=
 before_install:
   - npm install -g gulp jspm
+  - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
   - jspm install
 script: gulp
