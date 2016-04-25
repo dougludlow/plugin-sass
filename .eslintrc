@@ -1,6 +1,14 @@
 {
   "parser": "babel-eslint",
-  "extends": "airbnb/base",
+  "extends": "airbnb-base",
+  "settings": {
+    "import/resolver": {
+      "jspm": {
+        "moduleDirectory": "src/jspm_packages"
+      },
+      "node": true
+    }
+  },
   "rules": {
     "strict": 0
   }
