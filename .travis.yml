@@ -1,11 +1,11 @@
 language: node_js
 node_js:
-  - '5.10'
+- '5.10'
+before_install:
+- npm install -g gulp jspm
+- jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
+- jspm install
+script: gulp
 env:
   global:
-  - secure: "K3NaeZy1jnEW1J3tlLcEAJguECu4W4oKMZpOHQPXTDecSbvdogPVi4+4/BWERnQbIUnkqRes5xWPJCeqGI4MrXcLyNaxNoruvjBLcEWCi7tGIjLF+heRUz+DX2Tmorkw5sJuImDKPqpYLy3bYnd8KhSWhCSMBYpWbnBEqabuMynd9kyslDte0dSyrq0buxfSl5B6Mh526smWg6uXHEgqm7GTpk+y0TPNJzwRXNBm0di7T0hj/bbbIRFq0e+5nHCSy1UOqK+9NG96koAFmuSHT0RIj9VrYLOErwZV3QLXNAfV4Ez4ADvi6sZRsT/Ie7OcU+9yPvfzHzm8FiOxhNs0lUcGn8fvOeBj+YG8m/7kiqMIkzkfAw/yf6jT4+/HQQWjx5PWVphlp/WGh2T9ApEi3QYsFVY0muw+PuuRLbsnuUDEggqw3x/xZBQ/1oLbcZaQkTCVs3TV+AM5yAH72h6FJHZufvEF+dTWLPfy4Nb6Qfiwmml/QI0hjPfu7FkDEGw4PLHkybIMvE89jKwn0hmDmrCHquj1+NrLBRjoJQD61tokn9xi0c2gvcnCWqScd0juWYiZxilVOUi1qw8BtbiMsPoV6X5qJYZbedmRVG0lkz3+TsDjV0OMiX2TWD/w4d4iNxgeiskSeLNKsmPrsbZIsFDSGaXcwFJ/megkGq0H5I8="
-before_install:
-  - npm install -g gulp jspm
-  - jspm config registries.github.auth $JSPM_GITHUB_AUTH_TOKEN
-  - jspm install
-script: gulp
+    secure: K0ipMS02npgm/Wr6QmS5e6pFQYgUfblIGtBsT4/PBItOapxuLqbqkIR/yJHdpYsag2KQagtoJ9oSVQ7aU0UEjk44Abq4SO7884xpKzqIU4F7PYhLDD0+d2sKeuv0SmiarbzWrI6AoQHp56aXhQxKGr3rti6znLagCv8Ou3GqsLvzc/mOpGNpWIimAFrvyeJs3C6SWSJzAChLOdt04H6K7H8LhFxMyMpBRu4UQSOCBb7XazJopmAdsGwtgQ825pVIfa1ewjEbVy1Mk35XWEV2dxVUtC+TpomR1pKkh/cQh/miOrTIAqf5PIg/iCJr616f1FjVNRs+j0EgF3aytWxOUnHSzvP1huajf5EtutVOtSKGBG+qUzupQQZtD+Ujr9C8+7I14NEVl0GBPkA05qlnJBxbpAVgbKTbNz/u9MtWDjw0b1JfEZYvGN/4t8wr82mFaKcYD21iYsnFv+fHKJ0SuWdktMK9ZGN92ovjC1shduFHnRG1XPcGwAjAi2x6pO/e1TBdugraTVoAyV83blhovXMfPmq6KpKuYJ9nwfL6O0XpiFzyZwhLrVGklnLp4xZnKk4pORnR2lqkSq39Uzqv1VFjFg4rdOtTiUMPBJDUWS7TfuBMnUTJdlXGLz3a6tMMF124f/OlwzT4N54CtLtHDmiX3+C0MlPtO/oceDLejC4=
