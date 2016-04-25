@@ -1,16 +1,10 @@
 {
   "parser": "babel-eslint",
   "extends": "airbnb-base",
-  "plugins": [
-    "import"
-  ],
   "settings": {
     "import/resolver": {
       "jspm": {
-        "moduleDirectory": "jspm_packages",
-         "pathsOverride": {
-           "public": "src"
-        }
+        "moduleDirectory": "src/jspm_packages"
       },
       "node": true
     }

@@ -45,7 +45,7 @@ gulp.task('bundle', ['clean'], () => bundle());
 
 gulp.task('bundleStatic', ['clean'], () => bundle(true));
 
-gulp.task('lint', cb => {
+gulp.task('lint', () => {
   const glob = [
     '!src/config.js',
     '!src/modernizr.js',
@@ -53,17 +53,10 @@ gulp.task('lint', cb => {
     'src/**/*.js',
     'test/**/*.spec.js',
   ];
-  fs.readJson('./.eslintrc', (err, config) => {
-    if (err) {
-      cb(err);
-    } else {
-      gulp.src(glob)
-        .pipe(eslint(config))
-        .pipe(eslint.format())
-        .pipe(eslint.failOnError())
-        .on('end', cb);
-    }
-  });
+  return gulp.src(glob)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
 });
 
 gulp.task('modernizr', () => {
