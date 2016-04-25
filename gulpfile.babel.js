@@ -1,7 +1,7 @@
 import browserSyncModule from 'browser-sync';
 import del from 'del';
 import eslint from 'gulp-eslint';
-import fse from 'fs-extra';
+import fs from 'fs-extra';
 import gulp from 'gulp';
 import modernizr from 'gulp-modernizr';
 import notify from 'gulp-notify';
@@ -14,11 +14,11 @@ import Builder from 'systemjs-builder';
 const browserSync = browserSyncModule.create();
 const bundle = (buildStatic = false) => {
   const copyFiles = new Promise((resolve, reject) => {
-    fse.copy('src/config.js', '.tmp/config.js', err => {
+    fs.copy('src/config.js', '.tmp/config.js', err => {
       if (err) {
         reject(err);
       } else {
-        fse.copy('src/jspm_packages/system.js', '.tmp/system.js', err2 => {
+        fs.copy('src/jspm_packages/system.js', '.tmp/system.js', err2 => {
           if (err2) {
             reject(err2);
           } else {
@@ -45,7 +45,7 @@ gulp.task('bundle', ['clean'], () => bundle());
 
 gulp.task('bundleStatic', ['clean'], () => bundle(true));
 
-gulp.task('lint', () => {
+gulp.task('lint', cb => {
   const glob = [
     '!src/config.js',
     '!src/modernizr.js',
@@ -53,10 +53,17 @@ gulp.task('lint', () => {
     'src/**/*.js',
     'test/**/*.spec.js',
   ];
-  return gulp.src(glob)
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failOnError());
+  fs.readJson('./.eslintrc', (err, config) => {
+    if (err) {
+      cb(err);
+    } else {
+      gulp.src(glob)
+        .pipe(eslint(config))
+        .pipe(eslint.format())
+        .pipe(eslint.failOnError())
+        .on('end', cb);
+    }
+  });
 });
 
 gulp.task('modernizr', () => {
