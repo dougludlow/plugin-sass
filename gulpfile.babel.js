@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import browserSyncModule from 'browser-sync';
 import del from 'del';
 import eslint from 'gulp-eslint';

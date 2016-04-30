@@ -1,5 +1,7 @@
 {
-  "optional": [
-    "es7.asyncFunctions"
+  "presets": ["es2015"],
+  "plugins": [
+    "syntax-async-functions",
+    "transform-async-to-generator"
   ]
 }
