@@ -11,6 +11,8 @@
 $ jspm install scss=sass
 ```
 
+**Note**: please use the latest stable release. This plugin does not work with the latest jspm beta.
+
 To apply your SASS styles to your current page asynchronously:
 
 ```js
@@ -29,6 +31,8 @@ You can also use the [older syntax](http://sass-lang.com/documentation/file.SASS
 ```js
 System.import('./style.sass!scss');
 ```
+
+**Note**: if you use a different transpiler as Babel, like [TypeScript](http://www.typescriptlang.org), the plugin does not work by default. This is because this plugin and jspm / SystemJS is based on ES2015 syntax. All code is written with the Babel transpiler so you have to use the transpiler first before you can use the plugin. Please have a look at issue [#25](https://github.com/mobilexag/plugin-sass/issues/25#issuecomment-179704867) for a solution.
 
 ## Importing from jspm
 
