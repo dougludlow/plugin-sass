@@ -11,8 +11,6 @@
 $ jspm install scss=sass
 ```
 
-**Note**: please use the latest stable release. This plugin does not work with the latest jspm beta.
-
 To apply your SASS styles to your current page asynchronously:
 
 ```js
