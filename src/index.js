@@ -1,4 +1,5 @@
 /* global __moduleName */
+/* eslint import/no-mutable-exports: "off" */
 let fetch;
 let translate;
 let bundle;
