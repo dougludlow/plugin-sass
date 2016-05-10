@@ -77,30 +77,31 @@ sassPluginOptions: {
 ## Testing the plugin
 
 ```sh
-$ npm install -g gulp
-...
 $ npm install
 ...
 $ jspm install
 ```
 
-Now you can test runtime compilation
+To run unit tests just do a
 
 ```sh
-$ gulp test:runtime
+$ npm run test
 ```
 
-bundling
+To test that everything works in your browser you can test runtime compilation
 
 ```sh
-$ gulp test:bundle
+$ npm run test:runtime
 ```
 
-or static bundling
+or bundling
 
 ```sh
-$ gulp test:bundleStatic
+$ npm run test:bundle
 ```
 
-After that open [http://localhost:3000](http://localhost:3000) in the browser
-of your choice.
+or self-executing bundle
+
+```sh
+$ npm run test:bundleSfx
+```

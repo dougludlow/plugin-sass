@@ -8,7 +8,7 @@ html
     script(src='config.js')
     script(src='bundle.js')
     script(type='text/javascript').
-      System.import('test/bundleme')
+      System.import('test/browser/bundleme')
         .then(function() {
           document.addEventListener('DOMContentLoaded', function() {
             document.body.innerHTML += '<h2>Loading done</h2>';
