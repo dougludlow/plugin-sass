@@ -27,7 +27,7 @@ describe('resolve-path', () => {
     return resolvePath(request, '/').should.eventually.equal('/mock/import.scss');
   });
 
-  it('should do a jspm import right', async () => {
+  it('should do a jspm import from a primarily installed module', async () => {
     System.config({
       baseURL: __dirname,
       defaultJSExtensions: true,
@@ -42,6 +42,7 @@ describe('resolve-path', () => {
     const request = {
       current: 'jspm:mock-package/mock-asset',
       previous: 'stdin',
+      options: { urlBase: '/' },
     };
     const p = await resolvePath(request, '/');
     // System.normalize in resolvePath will give us the absolute path
@@ -51,7 +52,35 @@ describe('resolve-path', () => {
     );
   });
 
-  it('should da a nested import', async () => {
+  it('should do a jspm import from an indirectly installed module', async () => {
+    System.config({
+      baseURL: __dirname,
+      defaultJSExtensions: true,
+      paths: {
+        'github:*': 'jspm_packages/github/*',
+        'npm:*': 'jspm_packages/npm/*',
+      },
+      map: {
+        'mock-package': 'npm:mock-package@1.0.0',
+        'npm:mock-package@1.0.0': {
+          'indirect-package': 'npm:indirect-package@1.0.0',
+        },
+      },
+    });
+    const request = {
+      current: 'jspm:indirect-package/mock-asset',
+      previous: 'stdin',
+      options: { urlBase: '/jspm_packages/npm/mock-package@1.0.0/' },
+    };
+    const p = await resolvePath(request, '/');
+    // System.normalize in resolvePath will give us the absolute path
+    const relative = `/${path.relative(__dirname, url.parse(p).path)}`;
+    relative.should.equal(
+      `/${path.join('jspm_packages', 'npm', 'indirect-package@1.0.0', 'mock-asset.scss')}`
+    );
+  });
+
+  it('should do a nested import', async () => {
     let request = {
       current: 'mixins/mixin',
       previous: '/jspm_packages/npm/mock-package@1.0.0/mock-asset',
