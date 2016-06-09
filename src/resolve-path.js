@@ -10,11 +10,9 @@ async function resolvePath(request) {
     current = current.replace(/^jspm:/, '');
     if (!current.match(/\.s(c|a)ss/)) current += '.scss';
     // we need the parent, if the module of the file is not a primary install
-    let parent = `${System.baseURL}${request.options.urlBase}`;
-    // when adding urls, some unwanted double slashes may occur
-    if (System.baseURL.slice(-1) === '/' && request.options.urlBase.slice(0, 1) === '/') {
-      parent = `${System.baseURL}${request.options.urlBase.slice(1)}`;
-    }
+    const parentURL = url.parse(System.baseURL);
+    parentURL.pathname = request.options.urlBase;
+    const parent = url.format(parentURL);
     const file = await System.normalize(current, parent);
     return file.replace(/\.js$|\.ts$/, '');
   }

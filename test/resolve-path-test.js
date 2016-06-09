@@ -70,7 +70,7 @@ describe('resolve-path', () => {
     const request = {
       current: 'jspm:indirect-package/mock-asset',
       previous: 'stdin',
-      options: { urlBase: '/jspm_packages/npm/mock-package@1.0.0/' },
+      options: { urlBase: url.parse(`${__dirname}/jspm_packages/npm/mock-package@1.0.0/`).path },
     };
     const p = await resolvePath(request, '/');
     // System.normalize in resolvePath will give us the absolute path
