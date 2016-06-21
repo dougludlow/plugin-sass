@@ -11,7 +11,7 @@ async function resolvePath(request) {
     if (!current.match(/\.s(c|a)ss/)) current += '.scss';
     // we need the parent, if the module of the file is not a primary install
     const parentURL = url.parse(System.baseURL);
-    parentURL.pathname = request.options.urlBase;
+    parentURL.pathname = url.parse(request.options.urlBase).pathname;
     const parent = url.format(parentURL);
     const file = await System.normalize(current, parent);
     return file.replace(/\.js$|\.ts$/, '');
