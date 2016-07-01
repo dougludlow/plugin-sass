@@ -13,7 +13,7 @@ import url from 'url';
 
 import resolvePath from './resolve-path';
 
-const importSass = new Promise(async resolve => {
+const importSass = new Promise(async (resolve, reject) => {
   if (Modernizr.webworkers) {
     const Sass = await System.import('sass.js/dist/sass', __moduleName);
     const worker = await System.normalize('sass.js/dist/sass.worker', __moduleName);
