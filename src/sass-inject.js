@@ -12,6 +12,9 @@ import reqwest from 'reqwest';
 import url from 'url';
 
 import resolvePath from './resolve-path';
+import CssUrlRewriter from './css-url-rewriter';
+
+const urlRewriter = new CssUrlRewriter(System, System.sassPluginOptions);
 
 const importSass = new Promise(async (resolve) => {
   if (Modernizr.webworkers) {
@@ -82,12 +85,15 @@ async function compile(scss, styleUrl) {
   if (status !== 0) {
     throw formatted;
   }
-  if (!isUndefined(System.sassPluginOptions) &&
-      System.sassPluginOptions.autoprefixer) {
-    const { css } = await postcss([autoprefixer]).process(text);
+  const pluginOptions = System.sassPluginOptions || {};
+  const fixedText = pluginOptions.rewriteUrl
+    ? await urlRewriter.rewrite(styleUrl, text)
+    : text;
+  if (pluginOptions.autoprefixer) {
+    const { css } = await postcss([autoprefixer]).process(fixedText);
     inject(css);
   } else {
-    inject(text);
+    inject(fixedText);
   }
   // return an empty module in the module pipeline itself
   return '';

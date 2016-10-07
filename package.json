@@ -58,6 +58,7 @@
     "dependencies": {
       "autoprefixer": "npm:autoprefixer@^6.3.3",
       "fs": "github:jspm/nodelibs-fs@^0.1.2",
+      "fs-extra": "npm:fs-extra@^0.30.0",
       "lodash": "npm:lodash@^4.6.1",
       "path": "github:jspm/nodelibs-path@^0.1.0",
       "postcss": "npm:postcss@^5.0.18",

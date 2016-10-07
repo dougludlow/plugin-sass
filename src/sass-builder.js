@@ -4,27 +4,25 @@ import autoprefixer from 'autoprefixer';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
 import isEmpty from 'lodash/isEmpty';
-import isUndefined from 'lodash/isUndefined';
 import path from 'path';
 import postcss from 'postcss';
 import sass from 'sass.js';
 
 import resolvePath from './resolve-path';
+import CssUrlRewriter from './css-url-rewriter';
 
-const cssInject = "(function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})";
-const isWin = process.platform.match(/^win/);
+const urlRewriter = new CssUrlRewriter(System, System.sassPluginOptions);
 
-function escape(source) {
-  return source
-    .replace(/(["\\])/g, '\\$1')
-    .replace(/[\f]/g, '\\f')
-    .replace(/[\b]/g, '\\b')
-    .replace(/[\n]/g, '\\n')
-    .replace(/[\t]/g, '\\t')
-    .replace(/[\r]/g, '\\r')
-    .replace(/[\ufeff]/g, '')
-    .replace(/[\u2028]/g, '\\u2028')
-    .replace(/[\u2029]/g, '\\u2029');
+function cssInject(css) {
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+  const head = document.head || document.getElementsByTagName('head')[0];
+  head.appendChild(style);
 }
 
 function loadFile(file) {
@@ -41,7 +39,7 @@ function loadFile(file) {
 
 function fromFileURL(url) {
   const address = decodeURIComponent(url.replace(/^file:(\/+)?/i, ''));
-  return !isWin ? `/${address}` : address.replace(/\//g, '\\');
+  return path.sep === '/' ? `/${address}` : address.replace(/\//g, '\\');
 }
 
 // intercept file loading requests (@import directive) from libsass
@@ -70,12 +68,13 @@ sass.importer(async (request, done) => {
 });
 
 export default async function sassBuilder(loads, compileOpts) {
+  const pluginOptions = System.sassPluginOptions || {};
+
   async function compile(load) {
     const urlBase = `${path.dirname(load.address)}/`;
     let options = {};
-    if (!isUndefined(System.sassPluginOptions) &&
-        !isUndefined(System.sassPluginOptions.sassOptions)) {
-      options = cloneDeep(System.sassPluginOptions.sassOptions);
+    if (pluginOptions.sassOptions) {
+      options = cloneDeep(pluginOptions.sassOptions);
     }
     options.style = sass.style.compressed;
     options.indentedSyntax = load.address.endsWith('.sass');
@@ -90,12 +89,17 @@ export default async function sassBuilder(loads, compileOpts) {
     if (status !== 0) {
       throw formatted;
     }
-    if (!isUndefined(System.sassPluginOptions) &&
-        System.sassPluginOptions.autoprefixer) {
-      const { css } = await postcss([autoprefixer]).process(text);
+    const fixedText = pluginOptions.rewriteUrl
+      ? await urlRewriter.rewrite(load.address, text, {
+        copyAssets: pluginOptions.copyAssets,
+        copyTarget: path.dirname(compileOpts.outFile),
+      })
+      : text;
+    if (pluginOptions.autoprefixer) {
+      const { css } = await postcss([autoprefixer]).process(fixedText);
       return css;
     }
-    return text;
+    return fixedText;
   }
   const stubDefines = loads.map(({ name }) =>
     `${(compileOpts.systemGlobal || 'System')}\.register('${name}', [], false, function() {});`
@@ -107,7 +111,7 @@ export default async function sassBuilder(loads, compileOpts) {
   }
   return [
     stubDefines,
-    cssInject,
-    `("${escape(styles.reverse().join(''))}");`,
+    `(${cssInject.toString()})`,
+    `(${JSON.stringify(styles.reverse().join(''))});`,
   ].join('\n');
 }
