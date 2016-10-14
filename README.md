@@ -33,6 +33,13 @@ System.import('./style.sass!scss');
 
 **Note**: if you use a different transpiler as Babel, like [TypeScript](http://www.typescriptlang.org), the plugin does not work by default. This is because this plugin and jspm / SystemJS is based on ES2015 syntax. All code is written with the Babel transpiler so you have to use the transpiler first before you can use the plugin. Please have a look at issue [#25](https://github.com/mobilexag/plugin-sass/issues/25#issuecomment-179704867) for a solution.
 
+## Features
+
+- sass, scss
+- @import supported
+- "jspm:" prefix to refer jspm packages
+- url rewrite and asset copier
+
 ## Importing from jspm
 
 You can import scss files from jspm packages *from within scss files* using the `jspm:` prefix. For example, if you have jspm installed `twbs/bootstrap-sass`:
@@ -72,6 +79,23 @@ sassPluginOptions: {
   "sassOptions": {
 
   }
+}
+```
+
+## URL rewriter and asset copier
+
+Options `rewriteUrl` enables rewrite scss URLs to use correct path from SystemJS base URL.
+
+Option `copyAssets` enables copy CSS-related assets into destination folder.
+
+```sh
+jspm build app dist/app.js --format global --minify --skip-source-maps
+```
+
+```js
+sassPluginOptions: {
+  "copyAssets": true,
+  "rewriteUrl": true
 }
 ```
 

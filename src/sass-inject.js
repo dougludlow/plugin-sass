@@ -11,10 +11,10 @@ import postcss from 'postcss';
 import reqwest from 'reqwest';
 import url from 'url';
 
-import resolvePath from './resolve-path';
-import CssUrlRewriter from './css-url-rewriter';
+import CssUrlRewriter from 'css-url-rewrite-tools/CssUrlRewriter';
 
-const urlRewriter = new CssUrlRewriter(System, System.sassPluginOptions);
+import injectStyle from './inject-style';
+import resolvePath from './resolve-path';
 
 const importSass = new Promise(async (resolve) => {
   if (Modernizr.webworkers) {
@@ -74,26 +74,32 @@ async function compile(scss, styleUrl) {
   function inject(css) {
     tryCleanup();
     const style = document.createElement('style');
-    style.setAttribute('type', 'text/css');
+    style.type = 'text/css';
     style.setAttribute('data-url', styleUrl);
-    style.textContent = css;
-    document.getElementsByTagName('head')[0].appendChild(style);
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+    const head = document.head || document.getElementsByTagName('head')[0];
+    head.appendChild(style);
   }
-  const { status, text, formatted } = await new Promise(res => {
+  let { status, text, formatted } = await new Promise(res => {  // eslint-disable-line
     sass.compile(content, scss.options, res);
   });
   if (status !== 0) {
     throw formatted;
   }
   const pluginOptions = System.sassPluginOptions || {};
-  const fixedText = pluginOptions.rewriteUrl
-    ? await urlRewriter.rewrite(styleUrl, text)
-    : text;
+  if (pluginOptions.rewriteUrl) {
+    const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
+    text = urlRewriter.rewrite(styleUrl, text);
+  }
   if (pluginOptions.autoprefixer) {
-    const { css } = await postcss([autoprefixer]).process(fixedText);
+    const { css } = await postcss([autoprefixer]).process(text);
     inject(css);
   } else {
-    inject(fixedText);
+    inject(text);
   }
   // return an empty module in the module pipeline itself
   return '';

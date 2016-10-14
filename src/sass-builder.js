@@ -8,10 +8,10 @@ import path from 'path';
 import postcss from 'postcss';
 import sass from 'sass.js';
 
-import resolvePath from './resolve-path';
-import CssUrlRewriter from './css-url-rewriter';
+import CssUrlRewriter from 'css-url-rewrite-tools/CssUrlRewriter';
+import CssAssetCopier from 'css-url-rewrite-tools/CssAssetCopier';
 
-const urlRewriter = new CssUrlRewriter(System, System.sassPluginOptions);
+import resolvePath from './resolve-path';
 
 function cssInject(css) {
   const style = document.createElement('style');
@@ -83,35 +83,34 @@ export default async function sassBuilder(loads, compileOpts) {
     if (isEmpty(load.source)) {
       return '';
     }
-    const { status, text, formatted } = await new Promise(resolve => {
+    let { status, text, formatted } = await new Promise(resolve => {  // eslint-disable-line
       sass.compile(load.source, options, resolve);
     });
     if (status !== 0) {
       throw formatted;
     }
-    const fixedText = pluginOptions.rewriteUrl
-      ? await urlRewriter.rewrite(load.address, text, {
-        copyAssets: pluginOptions.copyAssets,
-        copyTarget: path.dirname(compileOpts.outFile),
-      })
-      : text;
+    if (pluginOptions.rewriteUrl) {
+      const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
+      text = urlRewriter.rewrite(load.address, text);
+      if (pluginOptions.copyAssets) {
+        const copyTarget = path.dirname(compileOpts.outFile);
+        const copier = new CssAssetCopier(copyTarget);
+        await copier.copyAssets(urlRewriter.getLocalAssetList());
+      }
+    }
     if (pluginOptions.autoprefixer) {
-      const { css } = await postcss([autoprefixer]).process(fixedText);
+      const { css } = await postcss([autoprefixer]).process(text);
       return css;
     }
-    return fixedText;
+    return text;
   }
-  const stubDefines = loads.map(({ name }) =>
-    `${(compileOpts.systemGlobal || 'System')}\.register('${name}', [], false, function() {});`
-  ).join('\n');
   // Keep style order
   const styles = [];
   for (const load of loads) {
     styles.push(await compile(load));
   }
   return [
-    stubDefines,
     `(${cssInject.toString()})`,
-    `(${JSON.stringify(styles.reverse().join(''))});`,
+    `(${JSON.stringify(styles.join(''))});`,
   ].join('\n');
 }
