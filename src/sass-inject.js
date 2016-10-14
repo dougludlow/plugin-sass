@@ -11,7 +11,7 @@ import postcss from 'postcss';
 import reqwest from 'reqwest';
 import url from 'url';
 
-import CssUrlRewriter from 'css-url-rewrite-tools/CssUrlRewriter';
+import CssUrlRewriter from 'css-url-rewriter-ex';
 
 import resolvePath from './resolve-path';
 

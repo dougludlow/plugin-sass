@@ -25,6 +25,8 @@ System.config({
     "babel-runtime": "npm:babel-runtime@5.8.25",
     "bootstrap": "github:twbs/bootstrap-sass@3.3.6",
     "core-js": "npm:core-js@1.2.0",
+    "css-asset-copier": "npm:css-asset-copier@1.0.1",
+    "css-url-rewriter-ex": "npm:css-url-rewriter-ex@1.0.4",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
     "fs-extra": "npm:fs-extra@0.30.0",
     "lodash": "npm:lodash@4.6.1",
@@ -184,6 +186,12 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
+    "npm:core-js@2.4.1": {
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "path": "github:jspm/nodelibs-path@0.1.0",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
+    },
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
@@ -220,6 +228,15 @@ System.config({
       "pbkdf2": "npm:pbkdf2@3.0.4",
       "public-encrypt": "npm:public-encrypt@4.0.0",
       "randombytes": "npm:randombytes@2.0.2"
+    },
+    "npm:css-asset-copier@1.0.1": {
+      "core-js": "npm:core-js@2.4.1",
+      "fs-extra": "npm:fs-extra@0.30.0",
+      "path": "github:jspm/nodelibs-path@0.1.0"
+    },
+    "npm:css-url-rewriter-ex@1.0.4": {
+      "core-js": "npm:core-js@2.4.1",
+      "path": "github:jspm/nodelibs-path@0.1.0"
     },
     "npm:des.js@1.0.0": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
@@ -263,12 +280,12 @@ System.config({
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:glob@7.1.0": {
+    "npm:glob@7.1.1": {
       "assert": "github:jspm/nodelibs-assert@0.1.0",
       "events": "github:jspm/nodelibs-events@0.1.1",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "fs.realpath": "npm:fs.realpath@1.0.0",
-      "inflight": "npm:inflight@1.0.5",
+      "inflight": "npm:inflight@1.0.6",
       "inherits": "npm:inherits@2.0.1",
       "minimatch": "npm:minimatch@3.0.3",
       "once": "npm:once@1.4.0",
@@ -291,7 +308,7 @@ System.config({
     "npm:hash.js@1.0.3": {
       "inherits": "npm:inherits@2.0.1"
     },
-    "npm:inflight@1.0.5": {
+    "npm:inflight@1.0.6": {
       "once": "npm:once@1.4.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
       "wrappy": "npm:wrappy@1.0.2"
@@ -402,7 +419,7 @@ System.config({
     "npm:rimraf@2.5.4": {
       "assert": "github:jspm/nodelibs-assert@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "glob": "npm:glob@7.1.0",
+      "glob": "npm:glob@7.1.1",
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },

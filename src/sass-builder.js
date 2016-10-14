@@ -8,8 +8,8 @@ import path from 'path';
 import postcss from 'postcss';
 import sass from 'sass.js';
 
-import CssUrlRewriter from 'css-url-rewrite-tools/CssUrlRewriter';
-import CssAssetCopier from 'css-url-rewrite-tools/CssAssetCopier';
+import CssUrlRewriter from 'css-url-rewriter-ex';
+import CssAssetCopier from 'css-asset-copier';
 
 import resolvePath from './resolve-path';
 
