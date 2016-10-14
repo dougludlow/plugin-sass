@@ -13,8 +13,21 @@ import url from 'url';
 
 import CssUrlRewriter from 'css-url-rewrite-tools/CssUrlRewriter';
 
-import injectStyle from './inject-style';
 import resolvePath from './resolve-path';
+
+function injectStyle(css) {
+  const style = document.createElement('style');
+  style.type = 'text/css';
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+
+  const head = document.head || document.getElementsByTagName('head')[0];
+  head.appendChild(style);
+}
 
 const importSass = new Promise(async (resolve) => {
   if (Modernizr.webworkers) {
@@ -63,27 +76,6 @@ async function compile(scss, styleUrl) {
     return '';
   }
   const sass = await importSass;
-
-  function tryCleanup() {
-    const element = document.querySelector(`style[data-url="${styleUrl}"]`);
-    if (element) {
-      element.parentElement.removeChild(element);
-    }
-  }
-
-  function inject(css) {
-    tryCleanup();
-    const style = document.createElement('style');
-    style.type = 'text/css';
-    style.setAttribute('data-url', styleUrl);
-    if (style.styleSheet) {
-      style.styleSheet.cssText = css;
-    } else {
-      style.appendChild(document.createTextNode(css));
-    }
-    const head = document.head || document.getElementsByTagName('head')[0];
-    head.appendChild(style);
-  }
   let { status, text, formatted } = await new Promise(res => {  // eslint-disable-line
     sass.compile(content, scss.options, res);
   });
@@ -97,9 +89,9 @@ async function compile(scss, styleUrl) {
   }
   if (pluginOptions.autoprefixer) {
     const { css } = await postcss([autoprefixer]).process(text);
-    inject(css);
+    injectStyle(css, styleUrl);
   } else {
-    inject(text);
+    injectStyle(text, styleUrl);
   }
   // return an empty module in the module pipeline itself
   return '';

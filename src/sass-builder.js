@@ -13,14 +13,27 @@ import CssAssetCopier from 'css-url-rewrite-tools/CssAssetCopier';
 
 import resolvePath from './resolve-path';
 
-function cssInject(css) {
+function injectStyle(css, url) {
+  if (url) {
+    const style = document.querySelector(`style[data-url="${url}"]`);
+    if (style) {
+      style.remove();
+    }
+  }
+
   const style = document.createElement('style');
   style.type = 'text/css';
+
+  if (url) {
+    style.setAttribute('data-url', url);
+  }
+
   if (style.styleSheet) {
     style.styleSheet.cssText = css;
   } else {
     style.appendChild(document.createTextNode(css));
   }
+
   const head = document.head || document.getElementsByTagName('head')[0];
   head.appendChild(style);
 }
@@ -110,7 +123,7 @@ export default async function sassBuilder(loads, compileOpts) {
     styles.push(await compile(load));
   }
   return [
-    `(${cssInject.toString()})`,
+    `(${injectStyle.toString()})`,
     `(${JSON.stringify(styles.join(''))});`,
   ].join('\n');
 }
