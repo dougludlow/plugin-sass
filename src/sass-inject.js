@@ -84,7 +84,10 @@ async function compile(scss, styleUrl) {
     text = urlRewriter.rewrite(styleUrl, text);
   }
   if (pluginOptions.autoprefixer) {
-    const { css } = await postcss([autoprefixer]).process(text);
+    const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
+      ? pluginOptions.autoprefixer
+      : undefined;
+    const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
     injectStyle(css, styleUrl);
   } else {
     injectStyle(text, styleUrl);

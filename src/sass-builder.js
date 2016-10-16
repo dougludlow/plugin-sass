@@ -112,7 +112,10 @@ export default async function sassBuilder(loads, compileOpts) {
       }
     }
     if (pluginOptions.autoprefixer) {
-      const { css } = await postcss([autoprefixer]).process(text);
+      const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
+        ? pluginOptions.autoprefixer
+        : undefined;
+      const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
       return css;
     }
     return text;
