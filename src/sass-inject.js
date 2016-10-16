@@ -11,9 +11,20 @@ import CssUrlRewriter from 'css-url-rewriter-ex';
 
 import resolvePath from './resolve-path';
 
-function injectStyle(css) {
+function injectStyle(css, url) {
+  if (url) {
+    const style = document.querySelector(`style[data-url="${url}"]`);
+    if (style) {
+      style.remove();
+    }
+  }
+
   const style = document.createElement('style');
   style.type = 'text/css';
+
+  if (url) {
+    style.setAttribute('data-url', url);
+  }
 
   if (style.styleSheet) {
     style.styleSheet.cssText = css;

@@ -13,20 +13,9 @@ import CssAssetCopier from 'css-asset-copier';
 
 import resolvePath from './resolve-path';
 
-function injectStyle(css, url) {
-  if (url) {
-    const style = document.querySelector(`style[data-url="${url}"]`);
-    if (style) {
-      style.remove();
-    }
-  }
-
+function injectStyle(css) {
   const style = document.createElement('style');
   style.type = 'text/css';
-
-  if (url) {
-    style.setAttribute('data-url', url);
-  }
 
   if (style.styleSheet) {
     style.styleSheet.cssText = css;
@@ -81,6 +70,7 @@ sass.importer(async (request, done) => {
 });
 
 export default async function sassBuilder(loads, compileOpts) {
+  console.log(compileOpts);
   const pluginOptions = System.sassPluginOptions || {};
 
   async function compile(load) {
@@ -89,7 +79,9 @@ export default async function sassBuilder(loads, compileOpts) {
     if (pluginOptions.sassOptions) {
       options = cloneDeep(pluginOptions.sassOptions);
     }
-    options.style = sass.style.compressed;
+    if (compileOpts.minify) {
+      options.style = sass.style.compressed;
+    }
     options.indentedSyntax = load.address.endsWith('.sass');
     options.importer = { urlBase };
     // Occurs on empty files
