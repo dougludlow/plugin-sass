@@ -1,3 +1,5 @@
+/* eslint-env mocha */
+
 import 'babel-polyfill';
 
 import chai from 'chai';

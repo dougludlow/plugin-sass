@@ -1,5 +1,3 @@
-/* eslint max-len: "off" */
-
 import autoprefixer from 'autoprefixer';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
@@ -69,11 +67,16 @@ sass.importer(async (request, done) => {
   done({ content, path: resolved });
 });
 
-export default async function sassBuilder(loads, compileOpts) {
-  console.log(compileOpts);
+export default async function sassBuilder(loads, compileOpts, outputOpts) {
   const pluginOptions = System.sassPluginOptions || {};
 
   async function compile(load) {
+    // skip empty files
+    if (isEmpty(load.source)) {
+      return '';
+    }
+
+    // compile module
     const urlBase = `${path.dirname(load.address)}/`;
     let options = {};
     if (pluginOptions.sassOptions) {
@@ -84,16 +87,14 @@ export default async function sassBuilder(loads, compileOpts) {
     }
     options.indentedSyntax = load.address.endsWith('.sass');
     options.importer = { urlBase };
-    // Occurs on empty files
-    if (isEmpty(load.source)) {
-      return '';
-    }
     let { status, text, formatted } = await new Promise(resolve => {  // eslint-disable-line
       sass.compile(load.source, options, resolve);
     });
     if (status !== 0) {
       throw formatted;
     }
+
+    // rewrite urls and copy assets if enabled
     if (pluginOptions.rewriteUrl) {
       const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
       text = urlRewriter.rewrite(load.address, text);
@@ -103,22 +104,36 @@ export default async function sassBuilder(loads, compileOpts) {
         await copier.copyAssets(urlRewriter.getLocalAssetList());
       }
     }
+
+    // apply autoprefixer if enabled
     if (pluginOptions.autoprefixer) {
       const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
         ? pluginOptions.autoprefixer
         : undefined;
       const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
-      return css;
+      text = css;
     }
+
     return text;
   }
-  // Keep style order
-  const styles = [];
+
+  // compile and merge styles for each module
+  let styles = [];
   for (const load of loads) {
     styles.push(await compile(load));
   }
+  styles = styles.join('');
+
+  // bundle css in separate file
+  if (System.separateCSS) {
+    const outFile = path.resolve(outputOpts.outFile).replace(/\.js$/, '.css');
+    fs.writeFileSync(outFile, styles);
+    return '';
+  }
+
+  // bundle inline css
   return [
     `(${injectStyle.toString()})`,
-    `(${JSON.stringify(styles.join(''))});`,
+    `(${JSON.stringify(styles)});`,
   ].join('\n');
 }

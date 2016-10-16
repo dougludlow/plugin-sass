@@ -1,2 +1,4 @@
 src/config.js
-src/jspm_packages
+jspm_packages
+node_modules
+.tmp

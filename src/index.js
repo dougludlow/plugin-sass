@@ -1,5 +1,5 @@
-/* global __moduleName */
 /* eslint import/no-mutable-exports: "off" */
+
 let fetch;
 let translate;
 let bundle;
@@ -12,12 +12,14 @@ if (typeof window !== 'undefined') {
 } else {
   // setting format = 'defined' means we're managing our own output
   translate = function translateIt(load) {
-    /* eslint no-param-reassign: "off" */
-    load.metadata.format = 'defined';
+    load.metadata.format = 'defined'; // eslint-disable-line no-param-reassign
+    if (this.builder && this.buildCSS === false) {
+      load.metadata.build = false;    // eslint-disable-line no-param-reassign
+    }
   };
-  bundle = async function bundler(loads, opts) {
+  bundle = async function bundler(loads, compileOpts, outputOpts) {
     const builder = await System.import('./sass-builder', { name: __moduleName });
-    return builder.default.call(System, loads, opts);
+    return builder.default.call(System, loads, compileOpts, outputOpts);
   };
 }
 

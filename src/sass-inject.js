@@ -76,6 +76,7 @@ importSass.then(sass => {
 });
 
 async function compile(scss, styleUrl) {
+  // compile module
   const content = scss.content;
   const responseText = content.responseText;
   if (isString(content) && isEmpty(content) ||
@@ -89,20 +90,26 @@ async function compile(scss, styleUrl) {
   if (status !== 0) {
     throw formatted;
   }
+
+  // rewrite urls and copy assets if enabled
   const pluginOptions = System.sassPluginOptions || {};
   if (pluginOptions.rewriteUrl) {
     const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
     text = urlRewriter.rewrite(styleUrl, text);
   }
+
+  // apply autoprefixer if enabled
   if (pluginOptions.autoprefixer) {
     const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
       ? pluginOptions.autoprefixer
       : undefined;
     const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
-    injectStyle(css, styleUrl);
-  } else {
-    injectStyle(text, styleUrl);
+    text = css;
   }
+
+  // inject module and remove old module
+  injectStyle(text, styleUrl);
+
   // return an empty module in the module pipeline itself
   return '';
 }
