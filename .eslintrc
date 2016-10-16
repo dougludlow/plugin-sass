@@ -15,7 +15,8 @@
     "beforeEach": false,
     "after": false,
     "afterEach": false,
-    "it": false
+    "it": false,
+    "__moduleName": true
   },
   "rules": {
     "strict": 0

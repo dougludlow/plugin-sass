@@ -18,14 +18,13 @@
     "clean": "rimraf .tmp",
     "lint": "eslint src test/**/*-test.js",
     "pug": "pug -o .tmp test/**/*.pug",
-    "modernizr": "modernizr -c modernizr-config.json -d src",
     "bundle": "cp-cli src/config.js .tmp/config.js && cp-cli src/jspm_packages/system.js .tmp/system.js && jspm bundle test/browser/bundleme .tmp/bundle.js",
     "bundleSfx": "jspm bundle-sfx test/browser/bundleme .tmp/bundle.js",
     "test": "mocha --compilers js:babel-register test/**/*-test.js",
-    "test:runtime": "npm run pug && npm run modernizr && browser-sync start -s '.tmp' --index runtime-test.html --ss 'src' --ss 'test/browser'",
-    "test:bundle": "npm run pug && npm run modernizr && npm run bundle && browser-sync start -s '.tmp' --index bundle-test.html --ss 'test/browser'",
-    "test:bundleSfx": "npm run pug && npm run modernizr && npm run bundleSfx && browser-sync start -s '.tmp' --index bundle-sfx-test.html --ss 'test/browser'",
-    "prepublish": "npm run modernizr && npm run lint && npm run test"
+    "test:runtime": "npm run pug && browser-sync start -s '.tmp' --index runtime-test.html --ss 'src' --ss 'test/browser'",
+    "test:bundle": "npm run pug && npm run bundle && browser-sync start -s '.tmp' --index bundle-test.html --ss 'test/browser'",
+    "test:bundleSfx": "npm run pug && npm run bundleSfx && browser-sync start -s '.tmp' --index bundle-sfx-test.html --ss 'test/browser'",
+    "prepublish": "npm run lint && npm run test"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.4",
@@ -44,7 +43,6 @@
     "eslint-plugin-import": "^1.7.0",
     "jspm": "^0.16.34",
     "mocha": "^2.4.5",
-    "modernizr": "^3.3.1",
     "pug-cli": "^1.0.0-alpha1",
     "rimraf": "^2.5.2",
     "systemjs": "^0.19.27"
