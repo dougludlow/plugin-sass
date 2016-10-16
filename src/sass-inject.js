@@ -1,7 +1,3 @@
-/* global Modernizr __moduleName */
-
-import './modernizr';
-
 import autoprefixer from 'autoprefixer';
 import isEmpty from 'lodash/isEmpty';
 import isString from 'lodash/isString';
@@ -30,7 +26,7 @@ function injectStyle(css) {
 }
 
 const importSass = new Promise(async (resolve) => {
-  if (Modernizr.webworkers) {
+  if (window.Worker) {
     const Sass = await System.import('sass.js/dist/sass', __moduleName);
     const worker = await System.normalize('sass.js/dist/sass.worker', __moduleName);
     resolve(new Sass(worker));
