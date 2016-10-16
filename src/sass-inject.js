@@ -11,9 +11,9 @@ import CssUrlRewriter from 'css-url-rewriter-ex';
 
 import resolvePath from './resolve-path';
 
-function injectStyle(css, url) {
+function injectStyle(css, address) {
   if (url) {
-    const style = document.querySelector(`style[data-url="${url}"]`);
+    const style = document.querySelector(`style[data-url="${address}"]`);
     if (style) {
       style.remove();
     }
