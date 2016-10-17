@@ -1,4 +1,5 @@
 import autoprefixer from 'autoprefixer';
+import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
 import isString from 'lodash/isString';
 import isUndefined from 'lodash/isUndefined';
@@ -115,6 +116,7 @@ async function compile(scss, styleUrl) {
 }
 
 export default async function sassInject(load) {
+  const pluginOptions = System.sassPluginOptions || {};
   let basePath = path.dirname(url.parse(load.address).pathname);
   if (basePath !== '/') {
     basePath += '/';
@@ -122,9 +124,8 @@ export default async function sassInject(load) {
   const urlBase = basePath;
   const indentedSyntax = load.address.endsWith('.sass');
   let options = {};
-  if (!isUndefined(System.sassPluginOptions) &&
-      !isUndefined(System.sassPluginOptions.sassOptions)) {
-    options = System.sassPluginOptions.sassOptions;
+  if (pluginOptions.sassOptions) {
+    options = cloneDeep(pluginOptions.sassOptions);
   }
   options.indentedSyntax = indentedSyntax;
   options.importer = { urlBase };
