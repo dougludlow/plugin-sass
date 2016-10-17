@@ -25,6 +25,19 @@ function injectStyle(css) {
   head.appendChild(style);
 }
 
+function stringifyStyle(css, minify) {
+  if (minify) {
+    return JSON.stringify(css);
+  }
+
+  const code = css.split(/(\r\n|\r|\n)/)
+    .map(line => JSON.stringify(`${line.trimRight()}`))
+    .filter(line => line !== '""')
+    .join(',\n');
+
+  return `[\n${code}\n].join('\\n')`;
+}
+
 function loadFile(file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file, { encoding: 'UTF-8' }, (err, data) => {
@@ -82,9 +95,7 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
     if (pluginOptions.sassOptions) {
       options = cloneDeep(pluginOptions.sassOptions);
     }
-    if (compileOpts.minify) {
-      options.style = sass.style.compressed;
-    }
+    options.style = compileOpts.minify ? sass.style.compressed : sass.style.expanded;
     options.indentedSyntax = load.address.endsWith('.sass');
     options.importer = { urlBase };
     let { status, text, formatted } = await new Promise(resolve => {  // eslint-disable-line
@@ -134,6 +145,6 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
   // bundle inline css
   return [
     `(${injectStyle.toString()})`,
-    `(${JSON.stringify(styles)});`,
+    `(${stringifyStyle(styles, compileOpts.minify)});`,
   ].join('\n');
 }
