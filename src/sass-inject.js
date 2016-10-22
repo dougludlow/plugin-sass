@@ -13,7 +13,7 @@ import CssUrlRewriter from 'css-url-rewriter-ex';
 import resolvePath from './resolve-path';
 
 function injectStyle(css, address) {
-  if (url) {
+  if (address) {
     const style = document.querySelector(`style[data-url="${address}"]`);
     if (style) {
       style.remove();
@@ -23,8 +23,8 @@ function injectStyle(css, address) {
   const style = document.createElement('style');
   style.type = 'text/css';
 
-  if (url) {
-    style.setAttribute('data-url', url);
+  if (address) {
+    style.setAttribute('data-url', address);
   }
 
   if (style.styleSheet) {
