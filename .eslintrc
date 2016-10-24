@@ -9,15 +9,14 @@
       "node": true
     }
   },
+  "plugins": [
+    "mocha"
+  ],
   "globals": {
-    "describe": false,
-    "before": false,
-    "beforeEach": false,
-    "after": false,
-    "afterEach": false,
-    "it": false
+    "__moduleName": true
   },
   "rules": {
-    "strict": 0
+    "strict": 0,
+    "import/no-unresolved": 0
   }
 }

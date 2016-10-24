@@ -1,30 +1,41 @@
-/* eslint max-len: "off" */
-
 import autoprefixer from 'autoprefixer';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
 import isEmpty from 'lodash/isEmpty';
-import isUndefined from 'lodash/isUndefined';
 import path from 'path';
 import postcss from 'postcss';
 import sass from 'sass.js';
 
+import CssUrlRewriter from 'css-url-rewriter-ex';
+import CssAssetCopier from 'css-asset-copier';
+
 import resolvePath from './resolve-path';
 
-const cssInject = "(function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})";
-const isWin = process.platform.match(/^win/);
+function injectStyle(css) {
+  const style = document.createElement('style');
+  style.type = 'text/css';
 
-function escape(source) {
-  return source
-    .replace(/(["\\])/g, '\\$1')
-    .replace(/[\f]/g, '\\f')
-    .replace(/[\b]/g, '\\b')
-    .replace(/[\n]/g, '\\n')
-    .replace(/[\t]/g, '\\t')
-    .replace(/[\r]/g, '\\r')
-    .replace(/[\ufeff]/g, '')
-    .replace(/[\u2028]/g, '\\u2028')
-    .replace(/[\u2029]/g, '\\u2029');
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+
+  const head = document.head || document.getElementsByTagName('head')[0];
+  head.appendChild(style);
+}
+
+function stringifyStyle(css, minify) {
+  if (minify) {
+    return JSON.stringify(css);
+  }
+
+  const code = css.split(/(\r\n|\r|\n)/)
+    .map(line => JSON.stringify(`${line.trimRight()}`))
+    .filter(line => line !== '""')
+    .join(',\n');
+
+  return `[\n${code}\n].join('\\n')`;
 }
 
 function loadFile(file) {
@@ -41,7 +52,7 @@ function loadFile(file) {
 
 function fromFileURL(url) {
   const address = decodeURIComponent(url.replace(/^file:(\/+)?/i, ''));
-  return !isWin ? `/${address}` : address.replace(/\//g, '\\');
+  return path.sep === '/' ? `/${address}` : address.replace(/\//g, '\\');
 }
 
 // intercept file loading requests (@import directive) from libsass
@@ -69,45 +80,71 @@ sass.importer(async (request, done) => {
   done({ content, path: resolved });
 });
 
-export default async function sassBuilder(loads, compileOpts) {
+export default async function sassBuilder(loads, compileOpts, outputOpts) {
+  const pluginOptions = System.sassPluginOptions || {};
+
   async function compile(load) {
-    const urlBase = `${path.dirname(load.address)}/`;
-    let options = {};
-    if (!isUndefined(System.sassPluginOptions) &&
-        !isUndefined(System.sassPluginOptions.sassOptions)) {
-      options = cloneDeep(System.sassPluginOptions.sassOptions);
-    }
-    options.style = sass.style.compressed;
-    options.indentedSyntax = load.address.endsWith('.sass');
-    options.importer = { urlBase };
-    // Occurs on empty files
+    // skip empty files
     if (isEmpty(load.source)) {
       return '';
     }
-    const { status, text, formatted } = await new Promise(resolve => {
+
+    // compile module
+    const urlBase = `${path.dirname(load.address)}/`;
+    let options = {};
+    if (pluginOptions.sassOptions) {
+      options = cloneDeep(pluginOptions.sassOptions);
+    }
+    options.style = compileOpts.minify ? sass.style.compressed : sass.style.expanded;
+    options.indentedSyntax = load.address.endsWith('.sass');
+    options.importer = { urlBase };
+    let { status, text, formatted } = await new Promise(resolve => {  // eslint-disable-line
       sass.compile(load.source, options, resolve);
     });
     if (status !== 0) {
       throw formatted;
     }
-    if (!isUndefined(System.sassPluginOptions) &&
-        System.sassPluginOptions.autoprefixer) {
-      const { css } = await postcss([autoprefixer]).process(text);
-      return css;
+
+    // rewrite urls and copy assets if enabled
+    if (pluginOptions.rewriteUrl) {
+      const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
+      text = urlRewriter.rewrite(load.address, text);
+      if (pluginOptions.copyAssets) {
+        const copyTarget = path.dirname(compileOpts.outFile);
+        const copier = new CssAssetCopier(copyTarget);
+        await copier.copyAssets(urlRewriter.getLocalAssetList());
+      }
     }
+
+    // apply autoprefixer if enabled
+    if (pluginOptions.autoprefixer) {
+      const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
+        ? pluginOptions.autoprefixer
+        : undefined;
+      const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
+      text = css;
+    }
+
     return text;
   }
-  const stubDefines = loads.map(({ name }) =>
-    `${(compileOpts.systemGlobal || 'System')}\.register('${name}', [], false, function() {});`
-  ).join('\n');
-  // Keep style order
-  const styles = [];
+
+  // compile and merge styles for each module
+  let styles = [];
   for (const load of loads) {
     styles.push(await compile(load));
   }
+  styles = styles.join('');
+
+  // bundle css in separate file
+  if (System.separateCSS) {
+    const outFile = path.resolve(outputOpts.outFile).replace(/\.js$/, '.css');
+    fs.writeFileSync(outFile, styles);
+    return '';
+  }
+
+  // bundle inline css
   return [
-    stubDefines,
-    cssInject,
-    `("${escape(styles.reverse().join(''))}");`,
+    `(${injectStyle.toString()})`,
+    `(${stringifyStyle(styles, compileOpts.minify)});`,
   ].join('\n');
 }

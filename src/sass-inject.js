@@ -1,8 +1,5 @@
-/* global Modernizr __moduleName */
-
-import './modernizr';
-
 import autoprefixer from 'autoprefixer';
+import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
 import isString from 'lodash/isString';
 import isUndefined from 'lodash/isUndefined';
@@ -11,10 +8,37 @@ import postcss from 'postcss';
 import reqwest from 'reqwest';
 import url from 'url';
 
+import CssUrlRewriter from 'css-url-rewriter-ex';
+
 import resolvePath from './resolve-path';
 
+function injectStyle(css, address) {
+  if (address) {
+    const style = document.querySelector(`style[data-url="${address}"]`);
+    if (style) {
+      style.remove();
+    }
+  }
+
+  const style = document.createElement('style');
+  style.type = 'text/css';
+
+  if (address) {
+    style.setAttribute('data-url', address);
+  }
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+
+  const head = document.head || document.getElementsByTagName('head')[0];
+  head.appendChild(style);
+}
+
 const importSass = new Promise(async (resolve) => {
-  if (Modernizr.webworkers) {
+  if (window.Worker) {
     const Sass = await System.import('sass.js/dist/sass', __moduleName);
     const worker = await System.normalize('sass.js/dist/sass.worker', __moduleName);
     resolve(new Sass(worker));
@@ -53,6 +77,7 @@ importSass.then(sass => {
 });
 
 async function compile(scss, styleUrl) {
+  // compile module
   const content = scss.content;
   const responseText = content.responseText;
   if (isString(content) && isEmpty(content) ||
@@ -60,40 +85,38 @@ async function compile(scss, styleUrl) {
     return '';
   }
   const sass = await importSass;
-
-  function tryCleanup() {
-    const element = document.querySelector(`style[data-url="${styleUrl}"]`);
-    if (element) {
-      element.parentElement.removeChild(element);
-    }
-  }
-
-  function inject(css) {
-    tryCleanup();
-    const style = document.createElement('style');
-    style.setAttribute('type', 'text/css');
-    style.setAttribute('data-url', styleUrl);
-    style.textContent = css;
-    document.getElementsByTagName('head')[0].appendChild(style);
-  }
-  const { status, text, formatted } = await new Promise(res => {
+  let { status, text, formatted } = await new Promise(res => {  // eslint-disable-line
     sass.compile(content, scss.options, res);
   });
   if (status !== 0) {
     throw formatted;
   }
-  if (!isUndefined(System.sassPluginOptions) &&
-      System.sassPluginOptions.autoprefixer) {
-    const { css } = await postcss([autoprefixer]).process(text);
-    inject(css);
-  } else {
-    inject(text);
+
+  // rewrite urls and copy assets if enabled
+  const pluginOptions = System.sassPluginOptions || {};
+  if (pluginOptions.rewriteUrl) {
+    const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
+    text = urlRewriter.rewrite(styleUrl, text);
   }
+
+  // apply autoprefixer if enabled
+  if (pluginOptions.autoprefixer) {
+    const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
+      ? pluginOptions.autoprefixer
+      : undefined;
+    const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
+    text = css;
+  }
+
+  // inject module and remove old module
+  injectStyle(text, styleUrl);
+
   // return an empty module in the module pipeline itself
   return '';
 }
 
 export default async function sassInject(load) {
+  const pluginOptions = System.sassPluginOptions || {};
   let basePath = path.dirname(url.parse(load.address).pathname);
   if (basePath !== '/') {
     basePath += '/';
@@ -101,9 +124,8 @@ export default async function sassInject(load) {
   const urlBase = basePath;
   const indentedSyntax = load.address.endsWith('.sass');
   let options = {};
-  if (!isUndefined(System.sassPluginOptions) &&
-      !isUndefined(System.sassPluginOptions.sassOptions)) {
-    options = System.sassPluginOptions.sassOptions;
+  if (pluginOptions.sassOptions) {
+    options = cloneDeep(pluginOptions.sassOptions);
   }
   options.indentedSyntax = indentedSyntax;
   options.importer = { urlBase };

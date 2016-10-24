@@ -1,14 +1,5 @@
-# Dependency directory
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
-
-# Transpiled JavaScript
-lib
-
-# JSPM
 jspm_packages
-
 npm-debug.log
 .tmp
-
-.vscode/
+.vscode
