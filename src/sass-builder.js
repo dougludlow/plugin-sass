@@ -1,9 +1,7 @@
-import autoprefixer from 'autoprefixer';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
 import isEmpty from 'lodash/isEmpty';
 import path from 'path';
-import postcss from 'postcss';
 import sass from 'sass.js';
 
 import CssUrlRewriter from 'css-url-rewriter-ex';
@@ -121,6 +119,8 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
       const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
         ? pluginOptions.autoprefixer
         : undefined;
+      const postcss = await System.import('postcss', __moduleName);
+      const autoprefixer = await System.import('autoprefixer', __moduleName);
       const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
       text = css;
     }
