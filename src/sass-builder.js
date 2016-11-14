@@ -4,7 +4,6 @@ import isEmpty from 'lodash/isEmpty';
 import path from 'path';
 import sass from 'sass.js';
 
-import CssUrlRewriter from 'css-url-rewriter-ex';
 import CssAssetCopier from 'css-asset-copier';
 
 import resolvePath from './resolve-path';
@@ -105,6 +104,8 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
 
     // rewrite urls and copy assets if enabled
     if (pluginOptions.rewriteUrl) {
+      const CssUrlRewriterModule = await System.import('css-url-rewriter-ex', __moduleName);
+      const CssUrlRewriter = CssUrlRewriterModule.default;
       const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
       text = urlRewriter.rewrite(load.address, text);
       if (pluginOptions.copyAssets) {

@@ -6,8 +6,6 @@ import path from 'path';
 import reqwest from 'reqwest';
 import url from 'url';
 
-import CssUrlRewriter from 'css-url-rewriter-ex';
-
 import resolvePath from './resolve-path';
 
 function injectStyle(css, address) {
@@ -93,6 +91,8 @@ async function compile(scss, styleUrl) {
   // rewrite urls and copy assets if enabled
   const pluginOptions = System.sassPluginOptions || {};
   if (pluginOptions.rewriteUrl) {
+    const CssUrlRewriterModule = await System.import('css-url-rewriter-ex', __moduleName);
+    const CssUrlRewriter = CssUrlRewriterModule.default;
     const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
     text = urlRewriter.rewrite(styleUrl, text);
   }
