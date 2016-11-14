@@ -1,6 +1,5 @@
-import cloneDeep from 'lodash/cloneDeep';
+import autoprefixer from 'autoprefixer';
 import fs from 'fs';
-import isEmpty from 'lodash/isEmpty';
 import path from 'path';
 import sass from 'sass.js';
 
@@ -82,7 +81,7 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
 
   async function compile(load) {
     // skip empty files
-    if (isEmpty(load.source)) {
+    if (!load.source || load.source === '') {
       return '';
     }
 
@@ -90,7 +89,7 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
     const urlBase = `${path.dirname(load.address)}/`;
     let options = {};
     if (pluginOptions.sassOptions) {
-      options = cloneDeep(pluginOptions.sassOptions);
+      options = Object.assign({}, pluginOptions.sassOptions);
     }
     options.style = compileOpts.minify ? sass.style.compressed : sass.style.expanded;
     options.indentedSyntax = load.address.endsWith('.sass');

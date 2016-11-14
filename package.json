@@ -59,7 +59,6 @@
       "css-asset-copier": "npm:css-asset-copier@^1.0.1",
       "css-url-rewriter-ex": "npm:css-url-rewriter-ex@^1.0.4",
       "fs": "github:jspm/nodelibs-fs@^0.1.2",
-      "lodash": "npm:lodash@^4.6.1",
       "path": "github:jspm/nodelibs-path@^0.1.0",
       "postcss": "npm:postcss@^5.0.18",
       "reqwest": "github:ded/reqwest@^2.0.5",

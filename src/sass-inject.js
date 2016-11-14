@@ -1,7 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
-import isUndefined from 'lodash/isUndefined';
+import autoprefixer from 'autoprefixer';
 import path from 'path';
 import reqwest from 'reqwest';
 import url from 'url';
@@ -76,8 +73,8 @@ async function compile(scss, styleUrl) {
   // compile module
   const content = scss.content;
   const responseText = content.responseText;
-  if (isString(content) && isEmpty(content) ||
-      !isUndefined(responseText) && isEmpty(responseText)) {
+  if (typeof content === 'string' && content === '' ||
+      typeof responseText !== 'undefined' && responseText === '') {
     return '';
   }
   const sass = await importSass;
@@ -125,7 +122,7 @@ export default async function sassInject(load) {
   const indentedSyntax = load.address.endsWith('.sass');
   let options = {};
   if (pluginOptions.sassOptions) {
-    options = cloneDeep(pluginOptions.sassOptions);
+    options = Object.assign({},pluginOptions.sassOptions);
   }
   options.indentedSyntax = indentedSyntax;
   options.importer = { urlBase };
