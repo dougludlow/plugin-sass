@@ -18,6 +18,7 @@ System.config({
     "autoprefixer": true,
     "sassOptions": {}
   },
+
   map: {
     "autoprefixer": "npm:autoprefixer@6.3.3",
     "babel": "npm:babel-core@5.8.25",
@@ -28,7 +29,6 @@ System.config({
     "css-url-rewriter-ex": "npm:css-url-rewriter-ex@1.0.4",
     "fs": "github:jspm/nodelibs-fs@0.1.2",
     "fs-extra": "npm:fs-extra@0.30.0",
-    "lodash": "npm:lodash@4.6.1",
     "path": "github:jspm/nodelibs-path@0.1.0",
     "postcss": "npm:postcss@5.0.18",
     "reqwest": "github:ded/reqwest@2.0.5",
@@ -336,10 +336,6 @@ System.config({
       "path": "github:jspm/nodelibs-path@0.1.0",
       "stream": "github:jspm/nodelibs-stream@0.1.0",
       "util": "github:jspm/nodelibs-util@0.1.0"
-    },
-    "npm:lodash@4.6.1": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
-      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:miller-rabin@4.0.0": {
       "bn.js": "npm:bn.js@4.10.0",
