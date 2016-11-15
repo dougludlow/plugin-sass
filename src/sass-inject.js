@@ -122,7 +122,7 @@ export default async function sassInject(load) {
   const indentedSyntax = load.address.endsWith('.sass');
   let options = {};
   if (pluginOptions.sassOptions) {
-    options = Object.assign({},pluginOptions.sassOptions);
+    options = Object.assign({}, pluginOptions.sassOptions);
   }
   options.indentedSyntax = indentedSyntax;
   options.importer = { urlBase };
