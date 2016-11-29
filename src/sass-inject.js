@@ -1,4 +1,3 @@
-import autoprefixer from 'autoprefixer';
 import path from 'path';
 import reqwest from 'reqwest';
 import url from 'url';

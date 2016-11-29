@@ -1,4 +1,3 @@
-import autoprefixer from 'autoprefixer';
 import fs from 'fs';
 import path from 'path';
 import sass from 'sass.js';
