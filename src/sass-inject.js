@@ -1,14 +1,10 @@
-import autoprefixer from 'autoprefixer';
 import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
 import isString from 'lodash/isString';
 import isUndefined from 'lodash/isUndefined';
 import path from 'path';
-import postcss from 'postcss';
 import reqwest from 'reqwest';
 import url from 'url';
-
-import CssUrlRewriter from 'css-url-rewriter-ex';
 
 import resolvePath from './resolve-path';
 
@@ -95,6 +91,8 @@ async function compile(scss, styleUrl) {
   // rewrite urls and copy assets if enabled
   const pluginOptions = System.sassPluginOptions || {};
   if (pluginOptions.rewriteUrl) {
+    const CssUrlRewriterModule = await System.import('css-url-rewriter-ex', __moduleName);
+    const CssUrlRewriter = CssUrlRewriterModule.default;
     const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
     text = urlRewriter.rewrite(styleUrl, text);
   }
@@ -104,6 +102,8 @@ async function compile(scss, styleUrl) {
     const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
       ? pluginOptions.autoprefixer
       : undefined;
+    const postcss = await System.import('postcss', __moduleName);
+    const autoprefixer = await System.import('autoprefixer', __moduleName);
     const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
     text = css;
   }

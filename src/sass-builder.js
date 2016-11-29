@@ -1,12 +1,9 @@
-import autoprefixer from 'autoprefixer';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
 import isEmpty from 'lodash/isEmpty';
 import path from 'path';
-import postcss from 'postcss';
 import sass from 'sass.js';
 
-import CssUrlRewriter from 'css-url-rewriter-ex';
 import CssAssetCopier from 'css-asset-copier';
 
 import resolvePath from './resolve-path';
@@ -107,6 +104,8 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
 
     // rewrite urls and copy assets if enabled
     if (pluginOptions.rewriteUrl) {
+      const CssUrlRewriterModule = await System.import('css-url-rewriter-ex', __moduleName);
+      const CssUrlRewriter = CssUrlRewriterModule.default;
       const urlRewriter = new CssUrlRewriter({ root: System.baseURL });
       text = urlRewriter.rewrite(load.address, text);
       if (pluginOptions.copyAssets) {
@@ -121,6 +120,8 @@ export default async function sassBuilder(loads, compileOpts, outputOpts) {
       const autoprefixerOptions = pluginOptions.autoprefixer instanceof Object
         ? pluginOptions.autoprefixer
         : undefined;
+      const postcss = await System.import('postcss', __moduleName);
+      const autoprefixer = await System.import('autoprefixer', __moduleName);
       const { css } = await postcss([autoprefixer(autoprefixerOptions)]).process(text);
       text = css;
     }
