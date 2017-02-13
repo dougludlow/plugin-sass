@@ -4,6 +4,14 @@
 [![Dependency Status](https://david-dm.org/mobilexag/plugin-sass.svg)](https://david-dm.org/mobilexag/plugin-sass)
 [![devDependency Status](https://david-dm.org/mobilexag/plugin-sass/dev-status.svg)](https://david-dm.org/mobilexag/plugin-sass#info=devDependencies)
 
+# This plugin is abandoned
+
+Unfortunately we switched the technology and don't have the time and bugdet
+to maintain this plugin anymore. If you are interested in maintaining this
+plugin please open an issue and we will transfer the ownership to your user.
+
+---------------
+
 [SystemJS](https://github.com/systemjs/systemjs)
 [SASS](http://sass-lang.com) loader plugin. Can easily be installed with
 [jspm](http://jspm.io) package manager.
