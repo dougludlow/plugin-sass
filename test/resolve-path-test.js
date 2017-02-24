@@ -8,6 +8,8 @@ import path from 'path';
 import url from 'url';
 import System from 'systemjs';
 
+global.System = System;
+
 import resolvePath from '../src/resolve-path';
 
 chai.should();
@@ -34,8 +36,8 @@ describe('resolve-path', () => {
       baseURL: __dirname,
       defaultJSExtensions: true,
       paths: {
-        'github:*': 'jspm_packages/github/*',
-        'npm:*': 'jspm_packages/npm/*',
+        'github:': 'jspm_packages/github/',
+        'npm:': 'jspm_packages/npm/',
       },
       map: {
         'mock-package': 'npm:mock-package@1.0.0',
@@ -59,8 +61,8 @@ describe('resolve-path', () => {
       baseURL: __dirname,
       defaultJSExtensions: true,
       paths: {
-        'github:*': 'jspm_packages/github/*',
-        'npm:*': 'jspm_packages/npm/*',
+        'github:': 'jspm_packages/github/',
+        'npm:': 'jspm_packages/npm/',
       },
       map: {
         'mock-package': 'npm:mock-package@1.0.0',

@@ -6,7 +6,7 @@ let bundle;
 
 if (typeof window !== 'undefined') {
   fetch = async function fetchIt(load) {
-    const inject = await System.import('./sass-inject', { name: __moduleName });
+    const inject = await System.import('./sass-inject', __moduleName);
     return inject.default(load);
   };
 } else {
@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
     }
   };
   bundle = async function bundler(loads, compileOpts, outputOpts) {
-    const builder = await System.import('./sass-builder', { name: __moduleName });
+    const builder = await System.import('./sass-builder', __moduleName);
     return builder.default.call(System, loads, compileOpts, outputOpts);
   };
 }
