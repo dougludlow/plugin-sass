@@ -1,8 +1,6 @@
 # JSPM SASS/SCSS Plugin
 
-[![Build Status](https://travis-ci.org/mobilexag/plugin-sass.svg?branch=master)](https://travis-ci.org/mobilexag/plugin-sass)
-[![Dependency Status](https://david-dm.org/mobilexag/plugin-sass.svg)](https://david-dm.org/mobilexag/plugin-sass)
-[![devDependency Status](https://david-dm.org/mobilexag/plugin-sass/dev-status.svg)](https://david-dm.org/mobilexag/plugin-sass#info=devDependencies)
+[![Build Status](https://travis-ci.org/dougludlow/plugin-sass.svg?branch=master)](https://travis-ci.org/dougludlow/plugin-sass)
 
 [SystemJS](https://github.com/systemjs/systemjs)
 [SASS](http://sass-lang.com) loader plugin. Can easily be installed with
