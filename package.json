@@ -18,12 +18,13 @@
     "clean": "rimraf .tmp",
     "lint": "eslint src test/**/*-test.js",
     "pug": "pug -o .tmp test/**/*.pug",
-    "bundle": "cp-cli src/config.js .tmp/config.js && cp-cli src/jspm_packages/system.js .tmp/system.js && jspm bundle test/browser/bundleme .tmp/bundle.js",
-    "bundleSfx": "jspm bundle-sfx test/browser/bundleme .tmp/bundle.js",
+    "copy": "cp-cli src/jspm.config.js .tmp/jspm.config.js && cp-cli src/jspm_packages/system.js .tmp/system.js",
+    "bundle": "npm run copy && jspm bundle test/browser/bundleme .tmp/bundle.js",
+    "build": "jspm build test/browser/bundleme .tmp/bundle.js",
     "test": "mocha --compilers js:babel-register test/**/*-test.js",
-    "test:runtime": "npm run pug && browser-sync start -s '.tmp' --index runtime-test.html --ss 'src' --ss 'test/browser'",
-    "test:bundle": "npm run pug && npm run bundle && browser-sync start -s '.tmp' --index bundle-test.html --ss 'test/browser'",
-    "test:bundleSfx": "npm run pug && npm run bundleSfx && browser-sync start -s '.tmp' --index bundle-sfx-test.html --ss 'test/browser'",
+    "test:runtime": "npm run clean && npm run copy && npm run pug && browser-sync start -s '.tmp' --index runtime-test.html --ss 'src' --ss 'test/browser'",
+    "test:bundle": "npm run clean && npm run pug && npm run bundle && browser-sync start -s '.tmp' --index bundle-test.html --ss 'test/browser'",
+    "test:build": "npm run clean && npm run pug && npm run build && browser-sync start -s '.tmp' --index build-test.html --ss 'test/browser'",
     "prepublish": "npm run lint && npm run test"
   },
   "devDependencies": {
@@ -43,11 +44,11 @@
     "eslint-import-resolver-node": "^0.2.3",
     "eslint-plugin-import": "^1.16.0",
     "eslint-plugin-mocha": "^4.7.0",
-    "jspm": "^0.16.34",
+    "jspm": "0.17.0-beta.40",
     "mocha": "^2.4.5",
     "pug-cli": "^1.0.0-alpha1",
     "rimraf": "^2.5.2",
-    "systemjs": "^0.19.27"
+    "systemjs": "^0.20.9"
   },
   "jspm": {
     "directories": {
@@ -58,18 +59,74 @@
       "autoprefixer": "npm:autoprefixer@^6.3.3",
       "css-asset-copier": "npm:css-asset-copier@^1.0.1",
       "css-url-rewriter-ex": "npm:css-url-rewriter-ex@^1.0.4",
-      "fs": "github:jspm/nodelibs-fs@^0.1.2",
-      "path": "github:jspm/nodelibs-path@^0.1.0",
       "postcss": "npm:postcss@^5.0.18",
       "reqwest": "github:ded/reqwest@^2.0.5",
-      "sass.js": "npm:sass.js@^0.9.6",
-      "url": "github:jspm/nodelibs-url@^0.1.0"
+      "sass.js": "npm:sass.js@^0.9.6"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.8.24",
       "babel-runtime": "npm:babel-runtime@^5.8.24",
       "bootstrap": "github:twbs/bootstrap-sass@^3.3.6",
-      "core-js": "npm:core-js@^1.1.4"
+      "core-js": "npm:core-js@^1.1.4",
+      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.21"
+    },
+    "peerDependencies": {
+      "assert": "npm:jspm-nodelibs-assert@^0.2.0",
+      "buffer": "npm:jspm-nodelibs-buffer@^0.2.0",
+      "child_process": "npm:jspm-nodelibs-child_process@^0.2.0",
+      "constants": "npm:jspm-nodelibs-constants@^0.2.0",
+      "crypto": "npm:jspm-nodelibs-crypto@^0.2.0",
+      "events": "npm:jspm-nodelibs-events@^0.2.0",
+      "fs": "npm:jspm-nodelibs-fs@^0.2.0",
+      "graceful-fs": "npm:graceful-fs@^4.1.9",
+      "http": "npm:jspm-nodelibs-http@^0.2.0",
+      "https": "npm:jspm-nodelibs-https@^0.2.0",
+      "os": "npm:jspm-nodelibs-os@^0.2.0",
+      "path": "npm:jspm-nodelibs-path@^0.2.0",
+      "process": "npm:jspm-nodelibs-process@^0.2.0",
+      "stream": "npm:jspm-nodelibs-stream@^0.2.0",
+      "string_decoder": "npm:jspm-nodelibs-string_decoder@^0.2.0",
+      "url": "npm:jspm-nodelibs-url@^0.2.0",
+      "util": "npm:jspm-nodelibs-util@^0.2.0",
+      "vm": "npm:jspm-nodelibs-vm@^0.2.0"
+    },
+    "overrides": {
+      "npm:babel-core@5.8.38": {
+        "main": "browser.js",
+        "dependencies": {},
+        "jspmNodeConversion": false,
+        "map": {
+          "regenerator/runtime": "babel-runtime/regenerator/runtime"
+        },
+        "meta": {
+          "browser.js": {
+            "exports": "babel",
+            "format": "global"
+          }
+        }
+      },
+      "npm:babel-runtime@5.8.38": {
+        "main": false,
+        "dependencies": {},
+        "optionalDependencies": {
+          "core-js": "^1.2.0"
+        }
+      },
+      "npm:inherits@2.0.3": {
+        "ignore": [
+          "test.js"
+        ]
+      },
+      "npm:sass.js@0.9.13": {
+        "map": {
+          "ws": "@empty"
+        },
+        "meta": {
+          "dist/sass.worker.js": {
+            "format": "global"
+          }
+        }
+      }
     }
   }
 }

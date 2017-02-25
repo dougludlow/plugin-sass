@@ -68,11 +68,10 @@ sass.importer(async (request, done) => {
     try {
       content = await loadFile(readImportPath);
     } catch (er) {
-      done();
-      return;
+      return done({ error: er });
     }
   }
-  done({ content, path: resolved });
+  return done({ content, path: resolved });
 });
 
 export default async function sassBuilder(loads, compileOpts, outputOpts) {
