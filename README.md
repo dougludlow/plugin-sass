@@ -1,5 +1,6 @@
 # JSPM SASS/SCSS Plugin
 
+[![npm version](https://badge.fury.io/js/plugin-sass.svg)](https://badge.fury.io/js/plugin-sass)
 [![Build Status](https://travis-ci.org/dougludlow/plugin-sass.svg?branch=master)](https://travis-ci.org/dougludlow/plugin-sass)
 
 [SystemJS](https://github.com/systemjs/systemjs)
